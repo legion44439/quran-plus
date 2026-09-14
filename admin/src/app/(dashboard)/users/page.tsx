@@ -1,5 +1,10 @@
 "use client";
 
+/**
+ * Управление ролями — только superadmin (AuthGuard + API 403).
+ * Свою роль менять нельзя, чтобы не потерять доступ.
+ */
+
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { DataTable, type Column } from "@/components/ui/DataTable";
@@ -11,6 +16,7 @@ import {
 } from "@/lib/users-api";
 import type { AdminUser, Role } from "@/lib/types";
 
+/** Все роли NestJS, включая user (лишить staff-доступа) */
 const ROLE_OPTIONS: { value: Role; label: string }[] = [
   { value: "user", label: "user" },
   { value: "moderator", label: "moderator" },
@@ -56,6 +62,7 @@ export default function UsersPage() {
     async (row: AdminUser, nextRole: Role) => {
       if (row.role === nextRole) return;
 
+      // Защита: не даём снять себе superadmin случайно
       if (currentUserId && row.id === currentUserId) {
         setError("Нельзя изменить собственную роль.");
         return;

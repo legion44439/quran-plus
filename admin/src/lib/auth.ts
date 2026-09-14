@@ -1,18 +1,25 @@
+/**
+ * Сессия админки в localStorage + проверка staff-ролей.
+ * Раньше был stub-токен; сейчас access/refresh от NestJS live auth.
+ * Staff-gate: роль user в админку не пускаем (только moderator|admin|superadmin).
+ */
 import type { AuthSession, AuthUser, MeResponse, Role } from "./types";
 
 const STORAGE_KEY = "qp_admin_session";
 
-/** Staff roles allowed into the admin UI */
+/** Роли staff: moderator | admin | superadmin — user сюда не входит */
 const STAFF_ROLES: ReadonlySet<Role> = new Set([
   "moderator",
   "admin",
   "superadmin",
 ]);
 
+/** Staff-gate для UI и bootstrap после /users/me */
 export function isStaffRole(role: Role | undefined | null): boolean {
   return role != null && STAFF_ROLES.has(role);
 }
 
+/** Только superadmin: /users, /settings и смена ролей */
 export function isSuperadmin(role: Role | undefined | null): boolean {
   return role === "superadmin";
 }
@@ -59,7 +66,7 @@ export function loadSession(): AuthSession | null {
     const parsed = JSON.parse(raw) as Partial<AuthSession> & {
       token?: string;
     };
-    // Migrate / reject legacy stub shape { token, user }
+    // Отбрасываем старый stub-формат { token, user } — нужен access+refresh
     if (
       !parsed?.accessToken ||
       !parsed?.refreshToken ||

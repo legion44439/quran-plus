@@ -1,5 +1,7 @@
 "use client";
 
+/** Оболочка dashboard: AuthGuard (staff + superadmin-маршруты) + сайдбар */
+
 import { AuthGuard } from "./AuthGuard";
 import { Sidebar } from "./Sidebar";
 

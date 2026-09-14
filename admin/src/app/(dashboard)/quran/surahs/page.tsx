@@ -1,5 +1,7 @@
 "use client";
 
+/** Список сур: live GET /surahs + удаление через Bearer DELETE */
+
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { PageHeader } from "@/components/ui/PageHeader";

@@ -1,3 +1,7 @@
+/**
+ * Live HTTP к NestJS (не mock): логин, refresh, logout, /users/me, authorizedFetch.
+ * API_BASE по умолчанию http://localhost:4000/api — порт backend.
+ */
 import {
   clearSession,
   loadSession,
@@ -11,6 +15,7 @@ import type {
   MeResponse,
 } from "./types";
 
+/** База NestJS API (:4000/api); переопределяется NEXT_PUBLIC_API_URL */
 export const API_BASE =
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api";
 
@@ -64,6 +69,7 @@ async function rawFetch(
   return { res, body };
 }
 
+/** POST /auth/login → access+refresh; роль проверяем уже в AuthContext */
 export async function loginApi(
   email: string,
   password: string
@@ -82,6 +88,7 @@ export async function loginApi(
   return body as AuthTokenResponse;
 }
 
+/** Ротация токенов без повторного ввода пароля */
 export async function refreshApi(
   refreshToken: string
 ): Promise<AuthTokenResponse> {
@@ -106,6 +113,7 @@ export async function logoutApi(refreshToken: string): Promise<void> {
   });
 }
 
+/** Актуальный профиль и роль с бэка (source of truth после логина) */
 export async function meApi(accessToken: string): Promise<MeResponse> {
   const { res, body } = await rawFetch("/users/me", {
     method: "GET",
@@ -138,9 +146,10 @@ function sessionFromTokens(
   };
 }
 
+/** Один общий refresh, чтобы параллельные 401 не крутили токен дважды */
 let refreshInFlight: Promise<AuthSession | null> | null = null;
 
-/** Rotate tokens using stored refreshToken; clears session on failure */
+/** Обновить сессию по refreshToken; при ошибке чистим localStorage */
 export async function tryRefreshSession(): Promise<AuthSession | null> {
   if (refreshInFlight) return refreshInFlight;
 
@@ -179,8 +188,8 @@ export async function tryRefreshSession(): Promise<AuthSession | null> {
 }
 
 /**
- * Authorized fetch: attaches Bearer accessToken.
- * On 401, tries refresh once then retries; clears session if refresh fails.
+ * Bearer-запрос для staff CRUD.
+ * На 401 — один refresh и повтор; если refresh упал, сессия сбрасывается.
  */
 export async function authorizedFetch(
   path: string,

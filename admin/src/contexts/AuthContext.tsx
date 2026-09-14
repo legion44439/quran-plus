@@ -1,5 +1,10 @@
 "use client";
 
+/**
+ * Live-auth вместо stub: bootstrap из localStorage → /users/me (или refresh).
+ * Staff-gate: роль user в админку не пускаем на логине и при старте.
+ */
+
 import {
   createContext,
   useCallback,
@@ -26,7 +31,7 @@ import type { AuthSession, AuthUser, Role } from "@/lib/types";
 
 type AuthContextValue = {
   user: AuthUser | null;
-  /** Access token (Bearer) — prefer authorizedFetch from @/lib/api for calls */
+  /** Bearer access — для API лучше authorizedFetch из @/lib/api */
   token: string | null;
   accessToken: string | null;
   refreshToken: string | null;
@@ -58,6 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       try {
         const me = await meApi(stored.accessToken);
+        // Staff-gate: роль user / не-staff — сессию выкидываем
         if (!isStaffRole(me.role)) {
           clearSession();
           if (!cancelled) setSession(null);
@@ -94,6 +100,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = useCallback(async (email: string, password: string) => {
     const tokens = await loginApi(email, password);
+    // Staff-gate на логине: moderator|admin|superadmin
     if (!isStaffRole(tokens.user.role)) {
       throw new Error(
         "У этой учётной записи нет доступа к админ-панели. Требуется роль модератора или администратора."
@@ -105,7 +112,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const me = await meApi(tokens.accessToken);
       user = mapMeToAuthUser(me);
     } catch {
-      // login payload is enough for session
+      // /users/me опционален — данных логина хватает для сессии
     }
 
     const next: AuthSession = {
@@ -123,7 +130,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         await logoutApi(current.refreshToken);
       } catch {
-        // ignore network / API errors on logout
+        // logout на бэке best-effort: локально всё равно чистим
       }
     }
     clearSession();

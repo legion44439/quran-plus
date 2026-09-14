@@ -1,3 +1,7 @@
+/**
+ * Пункты меню админки.
+ * superadminOnly — /users и /settings; hidden — видео (phase 2), в сайдбаре не показываем.
+ */
 import type { Role } from "./types";
 
 export type NavItem = {
@@ -6,7 +10,7 @@ export type NavItem = {
   labelEn: string;
   superadminOnly?: boolean;
   section?: string;
-  /** Hidden until feature is ready (phase 2) */
+  /** Скрыто до phase 2 (видео) — getNavForRole отфильтрует */
   hidden?: boolean;
 };
 
@@ -38,6 +42,7 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/reciters", labelRu: "Чтецы", labelEn: "Reciters" },
   { href: "/audio", labelRu: "Аудио", labelEn: "Audio" },
   {
+    // Видео: phase 2 — пункт скрыт, прямой URL остаётся stub-страницей
     href: "/videos",
     labelRu: "Видео",
     labelEn: "Videos",
@@ -54,6 +59,7 @@ export const NAV_ITEMS: NavItem[] = [
   },
 ];
 
+/** Меню по роли: без hidden; superadminOnly только у superadmin */
 export function getNavForRole(role: Role): NavItem[] {
   return NAV_ITEMS.filter(
     (item) =>

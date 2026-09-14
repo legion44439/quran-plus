@@ -1,6 +1,7 @@
 /**
- * Typed content CRUD against NestJS (/surahs, /ayahs, /translations, /reciters, /audio).
- * Mutations use Bearer via authorizedJson; GETs use public fetch (endpoints are @Public).
+ * Live CRUD контента к NestJS (:4000/api): суры, аяты, переводы, чтецы, аудио.
+ * GET публичные (@Public); POST/PATCH/DELETE — Bearer через authorizedJson (staff).
+ * Видео здесь нет — phase 2 (см. nav hidden + mock-api).
  */
 
 import { ApiError, apiUrl, authorizedJson } from "./api";
@@ -36,6 +37,7 @@ function messageFromBody(body: unknown, fallback: string): string {
   return fallback;
 }
 
+/** GET без токена: эндпоинты контента помечены @Public на бэке */
 async function publicJson<T>(path: string): Promise<T> {
   const res = await fetch(apiUrl(path));
   const text = await res.text();
@@ -78,7 +80,7 @@ function omitEmpty<T extends Record<string, unknown>>(obj: T): Partial<T> {
   return out as Partial<T>;
 }
 
-// ——— Surahs ———
+// ——— Суры: id = номер 1–114, как в NestJS CreateSurahDto ———
 
 export function listSurahs(): Promise<Surah[]> {
   return publicJson<Surah[]>("/surahs");
@@ -108,7 +110,7 @@ export function deleteSurah(id: number): Promise<{ success: boolean }> {
   });
 }
 
-// ——— Ayahs ———
+// ——— Аяты: UUID id; surahId — числовой номер суры ———
 
 export function listAyahs(params?: { surahId?: number }): Promise<Ayah[]> {
   return publicJson<Ayah[]>(`/ayahs${qs({ surahId: params?.surahId })}`);
@@ -138,7 +140,7 @@ export function deleteAyah(id: string): Promise<{ success: boolean }> {
   });
 }
 
-// ——— Translations ———
+// ——— Переводы: фильтр по ayahId / language ———
 
 export function listTranslations(params?: {
   ayahId?: string;
@@ -178,7 +180,7 @@ export function deleteTranslation(id: string): Promise<{ success: boolean }> {
   });
 }
 
-// ——— Reciters ———
+// ——— Чтецы: нужны до создания аудио-треков ———
 
 export function listReciters(): Promise<Reciter[]> {
   return publicJson<Reciter[]>("/reciters");
@@ -211,7 +213,7 @@ export function deleteReciter(id: string): Promise<{ success: boolean }> {
   });
 }
 
-// ——— Audio ———
+// ——— Аудио: URL + reciterId; сура/аят опциональны ———
 
 export function listAudio(params?: {
   reciterId?: string;
@@ -249,7 +251,7 @@ export function deleteAudio(id: string): Promise<{ success: boolean }> {
   });
 }
 
-/** Russian-friendly message from any thrown value */
+/** Сообщение ошибки для UI (русский fallback) */
 export function apiErrorMessage(err: unknown, fallback: string): string {
   if (err instanceof ApiError) return err.message || fallback;
   if (err instanceof Error && err.message) return err.message;

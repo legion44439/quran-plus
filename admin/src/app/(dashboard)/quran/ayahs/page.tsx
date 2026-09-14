@@ -1,5 +1,7 @@
 "use client";
 
+/** Список аятов с фильтром по суре (?surahId=) — live NestJS */
+
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { PageHeader } from "@/components/ui/PageHeader";

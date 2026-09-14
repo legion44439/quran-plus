@@ -1,5 +1,7 @@
 "use client";
 
+/** Сайдбар: пункты из getNavForRole (без video/hidden и без superadmin-only чужим) */
+
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { getNavForRole } from "@/lib/nav";

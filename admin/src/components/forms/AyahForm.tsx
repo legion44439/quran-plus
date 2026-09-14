@@ -1,5 +1,10 @@
 "use client";
 
+/**
+ * Форма аята → NestJS /ayahs.
+ * surahId задаём при создании; смена суры через PATCH API не поддерживается.
+ */
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";

@@ -1,5 +1,10 @@
 "use client";
 
+/**
+ * Форма суры → NestJS /surahs.
+ * Сура создаётся с числовым id 1–114, как в NestJS; при edit id нельзя менять.
+ */
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
@@ -14,7 +19,7 @@ import type { Surah } from "@/lib/types";
 
 type Props = {
   mode: "create" | "edit";
-  /** Numeric surah id (1–114) */
+  /** Числовой id суры (1–114) */
   id?: number;
   initial?: Partial<Surah>;
 };

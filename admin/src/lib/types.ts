@@ -1,3 +1,4 @@
+/** Роли NestJS: user — только приложение; staff админки = moderator|admin|superadmin */
 export type Role = "user" | "moderator" | "admin" | "superadmin";
 
 export interface AuthUser {

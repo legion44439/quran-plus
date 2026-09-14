@@ -1,7 +1,6 @@
 /**
- * Mock / fetch stubs for remaining stub pages (videos, categories, comments, reports).
- * Quran content CRUD lives in src/lib/content-api.ts against NestJS.
- * Real auth lives in src/lib/api.ts (API_BASE → :4000/api).
+ * Заглушки для страниц phase-2 / ещё не live (видео, категории, комментарии, жалобы).
+ * Live: auth → api.ts (:4000/api), контент Корана → content-api.ts.
  */
 
 import { API_BASE, apiUrl } from "./api";
@@ -15,7 +14,7 @@ async function stubDelay(ms = 200): Promise<void> {
   await new Promise((r) => setTimeout(r, ms));
 }
 
-/** Generic empty list — replace with authorizedFetch later */
+/** Пустой список-заглушка — позже заменить на authorizedFetch */
 export async function mockList<T>(
   _resource: string
 ): Promise<MockListResult<T>> {

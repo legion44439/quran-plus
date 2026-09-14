@@ -3,7 +3,7 @@
 import { PageHeader } from "@/components/ui/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
 
-/** Phase 2: video UI hidden from nav; direct URL shows stub */
+/** Phase 2: видео скрыто в меню; прямой URL — stub, CRUD не трогаем */
 export default function VideosPage() {
   return (
     <div>

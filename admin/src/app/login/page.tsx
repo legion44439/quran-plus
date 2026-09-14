@@ -1,5 +1,10 @@
 "use client";
 
+/**
+ * Вход в админку: POST /auth/login через AuthContext.
+ * Уже залогиненного staff сразу шлём на /dashboard.
+ */
+
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
@@ -14,6 +19,7 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
+  // Если сессия staff уже есть — форма логина не нужна
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
       router.replace("/dashboard");

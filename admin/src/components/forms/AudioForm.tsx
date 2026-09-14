@@ -1,5 +1,10 @@
 "use client";
 
+/**
+ * Форма аудио → NestJS /audio.
+ * Обязательны URL и чтец; сура/аят опциональны для привязки трека.
+ */
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
