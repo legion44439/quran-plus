@@ -31,7 +31,8 @@ CODE, QP Backend, QP Flutter, QP Admin, QP Infra, QP Материалы, QP Пе
 | Seed сура 1 | DONE | отчёт CODE / QP Советник |
 | Neon: migrate + seed | DONE | migrate+seed DONE, health 200 (QP Советник) |
 | Media presign (`POST /api/media/presign`) | DONE | `021b658` (main/box); env `R2_BUCKET` |
-| `R2_PUBLIC_BASE_URL` / `publicUrl` | DONE | в `backend/.env`: `https://pub-1174d0af2bc7465bb36bad1557e1b4bf.r2.dev` (r2.dev для `quran-plus-media`, QP Infra) |
+| `R2_PUBLIC_BASE_URL` / `publicUrl` | DONE | Infra URL + Backend smoke OK (CODE); `https://pub-1174d0af2bc7465bb36bad1557e1b4bf.r2.dev` |
+| Admin AudioForm → presign | В РАБОТЕ | QP Admin вяжет форму аудио к `POST /api/media/presign` (CODE) |
 | Cloudflare R2 (bindings/auth) | БЛОКЕР | Cloudflare-bindings needsAuth у Sanat |
 | Debug APK (test) | DONE | [releases/tag/debug-apk](https://github.com/legion44439/quran-plus/releases/tag/debug-apk) (`quran-plus-debug.apk`) |
 | arm64 test APK (Honor) | DONE | [releases/tag/apk-arm64-test](https://github.com/legion44439/quran-plus/releases/tag/apk-arm64-test) (`quran-plus-arm64.apk`, ~19–20 MB) |
@@ -65,4 +66,4 @@ CODE, QP Backend, QP Flutter, QP Admin, QP Infra, QP Материалы, QP Пе
 ## Примечания
 - Приоритеты меняет только Sanat / QP Советник.
 - Этот файл ведёт QP Контроль.
-- Neon + `R2_PUBLIC_BASE_URL` + media/presign — DONE. Открыто: Cloudflare-bindings auth, API URL с телефона.
+- Neon + `R2_PUBLIC_BASE_URL` + media/presign + backend publicUrl smoke — DONE. В работе: Admin AudioForm→presign. Открыто: Cloudflare-bindings auth, API URL с телефона.
