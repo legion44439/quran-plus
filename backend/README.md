@@ -151,6 +151,12 @@ curl -s -X POST http://localhost:4000/api/auth/logout \
 | `SUPERADMIN_EMAIL` | Seeded admin email |
 | `SUPERADMIN_PASSWORD` | Seeded admin password |
 | `PORT` | HTTP port (default 4000) |
+| `R2_ACCOUNT_ENDPOINT` | Cloudflare R2 S3 API endpoint |
+| `R2_ACCESS_KEY_ID` | R2 access key |
+| `R2_SECRET_ACCESS_KEY` | R2 secret |
+| `R2_BUCKET` | Bucket name from env (example: `quran-plus-media`) |
+| `R2_PUBLIC_BASE_URL` | Optional public CDN base (no trailing slash) |
+| `R2_ACCOUNT_ID` | Account id (docs / tooling; not required by SDK) |
 | `NODE_ENV` | When not `production`, forgot-password returns `resetToken` |
 
 Docker Compose Postgres: user `quran`, password `quran_secret`, db `quran_plus`, port `5432`.
@@ -168,7 +174,39 @@ surahs, ayahs, translations, reciters, audio, videos, categories
 
 **Stubs (Prisma-backed, minimal):** comments, favorites, reports, groups/messages
 
-**Out of scope:** Redis, S3, payments, full chat, Quran text import, real email delivery
+**Media (R2):** `POST /api/media/presign` — moderator|admin|superadmin
+
+**Out of scope:** Redis, payments, full chat, Quran text import, real email delivery
+
+
+## Media uploads (Cloudflare R2)
+
+Bucket name comes from env `R2_BUCKET` (example placeholder: `quran-plus-media`) — never hardcoded in TypeScript.
+
+1. Login as moderator|admin|superadmin and get `accessToken`.
+2. Request a presigned PUT URL:
+3. Upload the file with **PUT** to `uploadUrl` using the **same** `Content-Type`.
+4. Persist `publicUrl` (or `key`) on your content entity (e.g. `POST /api/audio`).
+
+If `R2_PUBLIC_BASE_URL` is set (no trailing slash), response includes `publicUrl = ${R2_PUBLIC_BASE_URL}/${key}`. If unset, `publicUrl` is `null` — use a private bucket strategy or set a public r2.dev / custom domain base.
+
+```bash
+TOKEN="<accessToken>"
+
+# Get presigned PUT
+curl -s -X POST http://localhost:4000/api/media/presign \
+  -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d '{"contentType":"audio/mpeg","folder":"audio","filename":"surah-1.mp3"}'
+
+# Response: { "uploadUrl", "publicUrl", "key", "expiresIn" }
+# Then PUT the binary:
+curl -s -X PUT "<uploadUrl>" \
+  -H 'Content-Type: audio/mpeg' \
+  --data-binary @surah-1.mp3
+```
+
+Required env: `R2_ACCOUNT_ENDPOINT`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET`. Optional: `R2_PUBLIC_BASE_URL`, `R2_ACCOUNT_ID` (docs only).
 
 ## Scripts
 

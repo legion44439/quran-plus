@@ -16,6 +16,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { RecitersModule } from './reciters/reciters.module';
 import { ReportsModule } from './reports/reports.module';
 import { SearchModule } from './search/search.module';
+import { StorageModule } from './storage/storage.module';
 import { SurahsModule } from './surahs/surahs.module';
 import { TranslationsModule } from './translations/translations.module';
 import { UsersModule } from './users/users.module';
@@ -44,6 +45,7 @@ import { VideosModule } from './videos/videos.module';
     ReportsModule,
     GroupsModule,
     SearchModule,
+    StorageModule,
     AuditModule,
   ],
   providers: [
