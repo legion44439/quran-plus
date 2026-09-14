@@ -36,7 +36,7 @@ CODE, QP Backend, QP Flutter, QP Admin, QP Infra, QP Материалы, QP Пе
 | Cloudflare R2 (bindings/auth) | БЛОКЕР | Cloudflare-bindings needsAuth у Sanat |
 | Debug APK (test) | DONE | [releases/tag/debug-apk](https://github.com/legion44439/quran-plus/releases/tag/debug-apk) (`quran-plus-debug.apk`) |
 | arm64 test APK (Honor) | DONE | [releases/tag/apk-arm64-test](https://github.com/legion44439/quran-plus/releases/tag/apk-arm64-test) (`quran-plus-arm64.apk`, ~19–20 MB) |
-| arm64 tunnel APK (Honor, временно) | DONE | тот же release: `quran-plus-arm64-tunnel.apk` (~89 MB debug); API `https://investigate-relevant-right-females.trycloudflare.com/api` (туннель временный, CODE) |
+| arm64 tunnel APK (Honor, временно) | DONE | тот же release: `quran-plus-arm64-tunnel.apk` (rebuild); API `https://michigan-buried-spas-allocated.trycloudflare.com/api` (туннель временный, CODE) |
 | Критерий: регистрация/логин на Android | В РАБОТЕ | поставить tunnel APK на Honor и прогнать smoke (туннель временный) |
 | Критерий: читать/слушать/поиск на устройстве | В РАБОТЕ | через tunnel APK; нужен smoke Sanat |
 | Критерий: профиль на устройстве | В РАБОТЕ | через tunnel APK; нужен smoke Sanat |
