@@ -186,3 +186,13 @@ export type StubListItem = {
   title: string;
   subtitle?: string;
 };
+
+/** NestJS GET /users list item (superadmin) */
+export interface AdminUser {
+  id: string;
+  email: string;
+  displayName: string | null;
+  role: Role;
+  isActive: boolean;
+  createdAt: string;
+}

@@ -30,7 +30,7 @@ Backend Swagger: `http://localhost:4000/api/docs`
 - Register / login / refresh / logout against NestJS.
 - Password: **min 8 chars**, at least **one letter** and **one number**.
 - Seeded superadmin (manual test): `admin@quranplus.local` / `Admin123!`
-- Forgot-password UI at `/forgot` — calls `/auth/forgot-password` (and reset). If the backend returns 404/501, the app shows that recovery is not enabled yet.
+- Forgot-password UI at `/forgot` — `POST /auth/forgot-password` `{email}` and `POST /auth/reset-password` `{token, newPassword}`. Non-prod may return `resetToken` for testing.
 
 ## Guest mode / Гость
 
@@ -67,7 +67,7 @@ RTL-ready layouts (`EdgeInsetsDirectional`).
 | `/settings` | Settings |
 | `/favorites` | Favorites |
 | `/downloads` | Downloads |
-| `/search` | Search (`GET /search`, resilient if missing) |
+| `/search` | Search (`GET /search?q=`) |
 | `/audio` | Audio player (`GET /audio` + just_audio) |
 
 ## Notes

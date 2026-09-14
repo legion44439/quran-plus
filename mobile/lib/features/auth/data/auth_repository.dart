@@ -62,7 +62,12 @@ class AuthRepository {
         data: {'email': email, 'password': password},
       );
       await _persistTokens(res.data);
-      return _userFromAuthResponse(res.data, fallbackEmail: email);
+      // Login user payload has no displayName — prefer /users/me.
+      try {
+        return await _fetchMe();
+      } catch (_) {
+        return _userFromAuthResponse(res.data, fallbackEmail: email);
+      }
     } on DioException catch (e) {
       throw ApiException.fromDio(e, fallback: 'Login failed');
     }
@@ -84,11 +89,15 @@ class AuthRepository {
         data: body,
       );
       await _persistTokens(res.data);
-      return _userFromAuthResponse(
-        res.data,
-        fallbackEmail: email,
-        fallbackName: name,
-      );
+      try {
+        return await _fetchMe();
+      } catch (_) {
+        return _userFromAuthResponse(
+          res.data,
+          fallbackEmail: email,
+          fallbackName: name,
+        );
+      }
     } on DioException catch (e) {
       throw ApiException.fromDio(e, fallback: 'Registration failed');
     }

@@ -174,16 +174,19 @@ class QuranRepository {
       final map = Map<String, dynamic>.from(data);
       final surah = SurahSummary.fromJson(map);
       final ayahsRaw = map['ayahs'];
-      List<AyahItem> ayahs = [];
+      List<AyahItem> nestedAyahs = [];
       if (ayahsRaw is List) {
-        ayahs = ayahsRaw
+        nestedAyahs = ayahsRaw
             .whereType<Map>()
             .map((e) => AyahItem.fromJson(Map<String, dynamic>.from(e)))
             .toList();
       }
-      if (ayahs.isEmpty) {
-        ayahs = await fetchAyahs(surahId: id);
-      }
+      // Nested /surahs/:id ayahs often omit translations; /ayahs is richer.
+      final fromAyahs = await fetchAyahs(surahId: id);
+      final ayahs = preferAyahsList(
+        nested: nestedAyahs,
+        fromAyahsEndpoint: fromAyahs,
+      );
       return SurahDetail(surah: surah, ayahs: ayahs);
     } on DioException catch (e) {
       if (e.response?.statusCode == 404) return null;
@@ -206,7 +209,17 @@ class QuranRepository {
     }
   }
 
-  Future<List<AyahItem>> fetchAyahs({int? surahId}) async {
+  /// Prefer /ayahs payload when non-empty (includes translations); nested is fallback.
+  /// Visible for unit tests.
+  List<AyahItem> preferAyahsList({
+    required List<AyahItem> nested,
+    required List<AyahItem> fromAyahsEndpoint,
+  }) {
+    if (fromAyahsEndpoint.isNotEmpty) return fromAyahsEndpoint;
+    return nested;
+  }
+
+    Future<List<AyahItem>> fetchAyahs({int? surahId}) async {
     try {
       final response = await _api.dio.get(
         '/ayahs',
@@ -246,7 +259,7 @@ class QuranRepository {
     }
   }
 
-  /// Hits GET /search. Backend may return 404/501 until implemented.
+  /// Hits GET /search. Empty groups = no hits; still tolerant of 404/501.
   Future<List<SearchHit>> search(String query) async {
     final q = query.trim();
     if (q.isEmpty) return const [];
@@ -267,22 +280,94 @@ class QuranRepository {
     }
   }
 
+  /// Visible for unit tests — flattens live GET /search shape.
+  List<SearchHit> parseSearchHitsForTest(dynamic data) => _parseSearchHits(data);
+
   List<SearchHit> _parseSearchHits(dynamic data) {
     if (data == null) return const [];
-    List<dynamic> items;
-    if (data is List) {
-      items = data;
-    } else if (data is Map) {
+
+    // NestJS search returns { surahs, ayahs, translations, reciters }.
+    if (data is Map) {
+      final hits = <SearchHit>[];
+      final surahs = data['surahs'];
+      if (surahs is List) {
+        for (final raw in surahs.whereType<Map>()) {
+          final m = Map<String, dynamic>.from(raw);
+          hits.add(SearchHit(
+            type: 'surah',
+            id: m['id']?.toString() ?? '',
+            title: m['nameLatin']?.toString() ??
+                m['nameEnglish']?.toString() ??
+                '',
+            subtitle: m['nameArabic']?.toString(),
+          ));
+        }
+      }
+      final ayahs = data['ayahs'];
+      if (ayahs is List) {
+        for (final raw in ayahs.whereType<Map>()) {
+          final m = Map<String, dynamic>.from(raw);
+          final surah = m['surah'];
+          String? surahName;
+          if (surah is Map) {
+            surahName = surah['nameLatin']?.toString();
+          }
+          final surahId = m['surahId']?.toString() ?? '';
+          hits.add(SearchHit(
+            type: 'ayah',
+            id: surahId.isNotEmpty ? surahId : (m['id']?.toString() ?? ''),
+            title: m['textArabic']?.toString() ?? '',
+            subtitle: [
+              if (surahName != null) surahName,
+              if (m['number'] != null) 'ayah ${m['number']}',
+            ].join(' · '),
+          ));
+        }
+      }
+      final translations = data['translations'];
+      if (translations is List) {
+        for (final raw in translations.whereType<Map>()) {
+          final m = Map<String, dynamic>.from(raw);
+          final ayah = m['ayah'];
+          String? surahId;
+          if (ayah is Map) {
+            surahId = ayah['surahId']?.toString();
+          }
+          hits.add(SearchHit(
+            type: 'translation',
+            id: surahId ?? m['ayahId']?.toString() ?? m['id']?.toString() ?? '',
+            title: m['text']?.toString() ?? '',
+            subtitle: m['language']?.toString(),
+          ));
+        }
+      }
+      final reciters = data['reciters'];
+      if (reciters is List) {
+        for (final raw in reciters.whereType<Map>()) {
+          final m = Map<String, dynamic>.from(raw);
+          hits.add(SearchHit(
+            type: 'reciter',
+            id: m['id']?.toString() ?? '',
+            title: m['name']?.toString() ?? '',
+            subtitle: m['nameArabic']?.toString(),
+          ));
+        }
+      }
+      if (hits.isNotEmpty) return hits;
+
+      // Fallback flat shapes
       final results = data['results'] ?? data['items'] ?? data['data'];
       if (results is List) {
-        items = results;
-      } else {
-        return const [];
+        return _parseFlatHits(results);
       }
-    } else {
       return const [];
     }
 
+    if (data is List) return _parseFlatHits(data);
+    return const [];
+  }
+
+  List<SearchHit> _parseFlatHits(List<dynamic> items) {
     return items.whereType<Map>().map((raw) {
       final m = Map<String, dynamic>.from(raw);
       final type = m['type']?.toString() ??

@@ -1,6 +1,6 @@
 /**
- * Mock / fetch stubs for future NestJS CRUD.
- * No seeded Quran content — empty collections by default.
+ * Mock / fetch stubs for remaining stub pages (videos, categories, comments, reports).
+ * Quran content CRUD lives in src/lib/content-api.ts against NestJS.
  * Real auth lives in src/lib/api.ts (API_BASE → :4000/api).
  */
 

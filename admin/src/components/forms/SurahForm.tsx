@@ -43,7 +43,15 @@ export function SurahForm({ mode, id, initial }: Props) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (mode !== "edit" || initial || id == null) return;
+    if (mode !== "edit" || initial) {
+      setLoading(false);
+      return;
+    }
+    if (id == null) {
+      setError("Некорректный ID суры");
+      setLoading(false);
+      return;
+    }
     let cancelled = false;
     (async () => {
       try {

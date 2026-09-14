@@ -50,6 +50,22 @@ npm start
 |-------|--------|------|
 | `admin@quranplus.local` | `Admin123!` | superadmin |
 
+## Контент CRUD (NestJS)
+
+Живой CRUD через `src/lib/content-api.ts` (мутации — Bearer / `authorizedJson`):
+
+| Ресурс | Пути API | Заметки |
+|--------|----------|---------|
+| Суры | `/surahs` | `id` = номер суры (Int 1–114); поля `nameArabic`, `nameLatin`, … |
+| Аяты | `/ayahs` | uuid; `surahId` Int; `textArabic` |
+| Переводы | `/translations` | uuid; фильтры `ayahId`, `language` |
+| Чтецы | `/reciters` | uuid |
+| Аудио | `/audio` | uuid; обязателен `reciterId` + `url` |
+
+GET-списки публичные; create/update/delete требуют роль moderator|admin|superadmin.
+
+Заглушки `mock-api.ts` оставлены для видео и прочих stub-страниц (categories/comments/reports).
+
 ## Структура
 
 ```
@@ -69,7 +85,8 @@ src/
   lib/
     api.ts                 # login/refresh/logout/me + authorizedFetch
     auth.ts                # session storage + staff helpers
-    mock-api.ts            # заглушки CRUD
+    content-api.ts         # CRUD сур/аятов/переводов/чтецов/аудио
+    mock-api.ts            # заглушки (видео и прочее)
     nav.ts
     types.ts
 ```

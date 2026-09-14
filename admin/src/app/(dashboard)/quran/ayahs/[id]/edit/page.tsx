@@ -7,10 +7,7 @@ export default async function EditAyahPage({ params }: Props) {
   const { id } = await params;
   return (
     <div>
-      <PageHeader
-        title="Редактировать аят"
-        description={`ID: ${id}`}
-      />
+      <PageHeader title="Редактировать аят" description={`ID: ${id}`} />
       <AyahForm mode="edit" id={id} />
     </div>
   );

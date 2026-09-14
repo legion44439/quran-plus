@@ -6,8 +6,8 @@ import 'package:go_router/go_router.dart';
 import '../../../core/network/api_exception.dart';
 import '../data/auth_repository.dart';
 
-/// Forgot / reset password UI.
-/// Backend currently has no forgot/reset endpoints — calls are resilient to 404/501.
+/// Forgot / reset password UI wired to NestJS:
+/// POST /auth/forgot-password {email}, POST /auth/reset-password {token, newPassword}.
 class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});
 
@@ -34,9 +34,6 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   }
 
   String _friendly(Object e) {
-    if (e is ApiException && e.message == 'recovery_not_enabled') {
-      return 'forgot_not_enabled'.tr();
-    }
     if (e is ApiException) return e.message;
     return apiErrorMessage(e);
   }
@@ -53,26 +50,26 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
       _info = null;
     });
     try {
-      await ref.read(authStateProvider.notifier).forgotPassword(email);
+      final result =
+          await ref.read(authStateProvider.notifier).forgotPassword(email);
       if (mounted) {
         setState(() {
-          _info = 'forgot_sent'.tr();
+          _info = result.message.isNotEmpty
+              ? result.message
+              : 'forgot_sent'.tr();
           _showReset = true;
+          if (result.resetToken != null && result.resetToken!.isNotEmpty) {
+            _token.text = result.resetToken!;
+          }
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('forgot_sent'.tr())),
+          SnackBar(content: Text(_info!)),
         );
       }
     } catch (e) {
       final msg = _friendly(e);
       if (mounted) {
-        setState(() {
-          _error = msg;
-          // Still allow reset UI so QA can try once backend lands.
-          if (e is ApiException && e.message == 'recovery_not_enabled') {
-            _showReset = true;
-          }
-        });
+        setState(() => _error = msg);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(msg)),
         );
