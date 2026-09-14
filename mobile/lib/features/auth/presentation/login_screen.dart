@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/network/api_exception.dart';
 import '../data/auth_repository.dart';
 
+/// Экран входа: email/password, гость (read-only) или переход к регистрации.
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 

@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../data/quran_repository.dart';
 
+/// Чтение суры: арабский текст + перевод (репозиторий тянет /ayahs).
 class SurahReaderScreen extends ConsumerWidget {
   const SurahReaderScreen({super.key, required this.surahId});
 

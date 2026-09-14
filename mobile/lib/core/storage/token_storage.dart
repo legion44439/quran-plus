@@ -5,7 +5,8 @@ final tokenStorageProvider = Provider<TokenStorage>((ref) {
   return TokenStorage();
 });
 
-/// Secure JWT placeholder storage (access + refresh).
+/// Безопасное хранение JWT (access + refresh) в Secure Storage.
+/// Нужно ApiClient для Bearer и refresh-on-401.
 class TokenStorage {
   TokenStorage({FlutterSecureStorage? storage})
       : _storage = storage ?? const FlutterSecureStorage();

@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../auth/data/auth_repository.dart';
 import '../../auth/domain/auth_state.dart';
 
+/// Профиль: гость/юзер, выход, ярлыки настроек/избранного/поиска.
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 

@@ -1,5 +1,8 @@
+/// Статус сессии: unknown (старт/офлайн), guest (чтение без аккаунта),
+/// authenticated. Guest — read-only: чаты/compose закрыты через [canCompose].
 enum AuthStatus { unknown, guest, authenticated }
 
+/// Состояние auth для UI и роутинга (имя/email/role после /users/me).
 class AuthState {
   const AuthState({
     this.status = AuthStatus.unknown,

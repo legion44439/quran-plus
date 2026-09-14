@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../data/quran_repository.dart';
 
+/// Список сур с API. Пусто до наполнения админом — ок, без хардкода Корана.
 class SurahListScreen extends ConsumerWidget {
   const SurahListScreen({super.key});
 

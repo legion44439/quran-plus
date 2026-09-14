@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../../quran/data/quran_repository.dart';
 
+/// Поиск по API: сгруппированный JSON → плоские hits; пусто при 404/501.
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
 

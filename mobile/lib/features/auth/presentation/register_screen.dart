@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/network/api_exception.dart';
 import '../data/auth_repository.dart';
 
+/// Регистрация. Имя уходит в API как displayName (не name).
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
 

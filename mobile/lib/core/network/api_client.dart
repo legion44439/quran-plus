@@ -9,10 +9,11 @@ final apiClientProvider = Provider<ApiClient>((ref) {
   return ApiClient(ref.watch(tokenStorageProvider));
 });
 
-/// Dio client with Bearer auth and one-shot refresh-on-401.
+/// HTTP-клиент приложения: Dio + Bearer JWT и однократный refresh при 401.
 ///
-/// [AppConfig.apiBaseUrl] already includes `/api`, so call paths like
-/// `/auth/login`, `/surahs`, `/users/me`.
+/// [AppConfig.apiBaseUrl] уже содержит префикс `/api` (NestJS global prefix),
+/// поэтому пути вызываем как `/auth/login`, `/surahs`, `/users/me` —
+/// без повторного `/api`.
 class ApiClient {
   ApiClient(this._tokenStorage) {
     _dio = Dio(
@@ -86,7 +87,7 @@ class ApiClient {
       final refresh = await _tokenStorage.readRefreshToken();
       if (refresh == null || refresh.isEmpty) return false;
 
-      // Separate Dio so refresh does not re-enter the interceptor loop.
+      // Отдельный Dio без интерцептора — иначе refresh зациклится на 401.
       final bare = Dio(
         BaseOptions(
           baseUrl: AppConfig.apiBaseUrl,
@@ -122,7 +123,7 @@ class ApiClient {
     }
   }
 
-  /// Expose NestJS message parsing for repositories/UI.
+  /// Прокси к разбору NestJS-ошибок для репозиториев/UI.
   static String errorMessage(Object error, {String fallback = 'Request failed'}) =>
       apiErrorMessage(error, fallback: fallback);
 }

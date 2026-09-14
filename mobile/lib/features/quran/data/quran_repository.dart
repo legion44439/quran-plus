@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/network/api_client.dart';
 
-/// Surah list item from NestJS (`nameArabic` / `nameLatin` / …).
+/// Краткая сура из NestJS (`nameArabic` / `nameLatin` / …).
+/// Контент с бэка; пустой список до наполнения админом — норма.
 class SurahSummary {
   const SurahSummary({
     required this.id,
@@ -40,6 +41,7 @@ class SurahSummary {
   }
 }
 
+/// Аят; перевод берём из translations[0].text или поля translation.
 class AyahItem {
   const AyahItem({
     required this.id,
@@ -147,6 +149,9 @@ final audioListProvider = FutureProvider<List<AudioTrack>>((ref) async {
   return ref.watch(quranRepositoryProvider).fetchAudio();
 });
 
+/// Доступ к Корану/аудио/поиску через NestJS.
+/// Важно: вложенные ayahs в GET /surahs/:id часто без переводов —
+/// предпочитаем GET /ayahs?surahId=; поиск — сгруппированный JSON.
 class QuranRepository {
   QuranRepository(this._api);
 
@@ -181,7 +186,7 @@ class QuranRepository {
             .map((e) => AyahItem.fromJson(Map<String, dynamic>.from(e)))
             .toList();
       }
-      // Nested /surahs/:id ayahs often omit translations; /ayahs is richer.
+      // Вложенные ayahs в /surahs/:id часто без переводов; /ayahs богаче.
       final fromAyahs = await fetchAyahs(surahId: id);
       final ayahs = preferAyahsList(
         nested: nestedAyahs,
@@ -190,7 +195,7 @@ class QuranRepository {
       return SurahDetail(surah: surah, ayahs: ayahs);
     } on DioException catch (e) {
       if (e.response?.statusCode == 404) return null;
-      // Fallback: try ayahs list by surahId.
+      // Запасной вариант: список аятов по surahId.
       try {
         final ayahs = await fetchAyahs(surahId: id);
         return SurahDetail(
@@ -209,8 +214,8 @@ class QuranRepository {
     }
   }
 
-  /// Prefer /ayahs payload when non-empty (includes translations); nested is fallback.
-  /// Visible for unit tests.
+  /// Берём /ayahs, если не пусто (там переводы); иначе вложенные ayahs.
+  /// Доступно для unit-тестов.
   List<AyahItem> preferAyahsList({
     required List<AyahItem> nested,
     required List<AyahItem> fromAyahsEndpoint,
@@ -259,7 +264,7 @@ class QuranRepository {
     }
   }
 
-  /// Hits GET /search. Empty groups = no hits; still tolerant of 404/501.
+  /// GET /search → {surahs,ayahs,translations,reciters}; 404/501 → пусто.
   Future<List<SearchHit>> search(String query) async {
     final q = query.trim();
     if (q.isEmpty) return const [];
@@ -280,13 +285,13 @@ class QuranRepository {
     }
   }
 
-  /// Visible for unit tests — flattens live GET /search shape.
+  /// Для тестов: разворот живой формы GET /search.
   List<SearchHit> parseSearchHitsForTest(dynamic data) => _parseSearchHits(data);
 
   List<SearchHit> _parseSearchHits(dynamic data) {
     if (data == null) return const [];
 
-    // NestJS search returns { surahs, ayahs, translations, reciters }.
+    // NestJS: { surahs, ayahs, translations, reciters } — склеиваем в плоский список.
     if (data is Map) {
       final hits = <SearchHit>[];
       final surahs = data['surahs'];
@@ -355,7 +360,7 @@ class QuranRepository {
       }
       if (hits.isNotEmpty) return hits;
 
-      // Fallback flat shapes
+      // Запасной вариант: плоские results/items/data
       final results = data['results'] ?? data['items'] ?? data['data'];
       if (results is List) {
         return _parseFlatHits(results);

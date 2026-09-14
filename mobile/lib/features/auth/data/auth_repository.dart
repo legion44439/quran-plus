@@ -6,6 +6,10 @@ import '../../../core/network/api_exception.dart';
 import '../../../core/storage/token_storage.dart';
 import '../domain/auth_state.dart';
 
+/// Репозиторий auth: login/register/guest, refresh, forgot/reset.
+/// Контракты NestJS: register body {email,password,displayName?} (не name);
+/// после login нет displayName — берём GET /users/me;
+/// reset-password body {token, newPassword}.
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
   return AuthRepository(
     ref.watch(apiClientProvider),
@@ -18,6 +22,7 @@ final authStateProvider =
   return AuthController(ref.watch(authRepositoryProvider));
 });
 
+/// Слой API-вызовов auth + сохранение JWT.
 class AuthRepository {
   AuthRepository(this._api, this._tokens);
 
@@ -45,7 +50,7 @@ class AuthRepository {
         await _tokens.clear();
         return const AuthState(status: AuthStatus.unknown);
       }
-      // Offline with stored token — stay unknown so splash can continue.
+      // Офлайн при наличии токена — оставляем unknown, splash продолжит.
       return const AuthState(status: AuthStatus.unknown);
     } catch (_) {
       return const AuthState(status: AuthStatus.unknown);
@@ -62,7 +67,7 @@ class AuthRepository {
         data: {'email': email, 'password': password},
       );
       await _persistTokens(res.data);
-      // Login user payload has no displayName — prefer /users/me.
+      // В ответе login нет displayName — предпочитаем GET /users/me.
       try {
         return await _fetchMe();
       } catch (_) {
@@ -83,6 +88,7 @@ class AuthRepository {
         'email': email,
         'password': password,
       };
+      // API ждёт displayName, не name.
       if (name.isNotEmpty) body['displayName'] = name;
       final res = await _api.dio.post<Map<String, dynamic>>(
         '/auth/register',
@@ -118,13 +124,13 @@ class AuthRepository {
         );
       }
     } catch (_) {
-      // Still clear local tokens even if revoke fails.
+      // Локальные токены чистим даже если revoke на сервере упал.
     }
     await _tokens.clear();
   }
 
   /// POST /auth/forgot-password { email }.
-  /// Returns message; in non-prod backend may also include resetToken.
+  /// В non-prod бэкенд может вернуть resetToken для UI сброса.
   Future<ForgotPasswordResult> forgotPassword(String email) async {
     try {
       final res = await _api.dio.post<Map<String, dynamic>>(
@@ -141,7 +147,7 @@ class AuthRepository {
     }
   }
 
-  /// POST /auth/reset-password { token, newPassword }.
+  /// POST /auth/reset-password { token, newPassword } — поле именно newPassword.
   Future<void> resetPassword({
     required String token,
     required String password,
@@ -227,6 +233,7 @@ class AuthRepository {
   }
 }
 
+/// Riverpod-контроллер сессии: restore при старте, login/guest/logout.
 class AuthController extends StateNotifier<AuthState> {
   AuthController(this._repo) : super(const AuthState()) {
     _restore();

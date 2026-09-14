@@ -1,8 +1,8 @@
-/// App configuration. Override API base URL at build/run time:
+/// Конфиг приложения. Базовый URL API переопределяется при сборке:
 /// `flutter run --dart-define=API_BASE_URL=http://10.0.2.2:4000/api`
 ///
-/// Default includes the NestJS global prefix `/api`. Paths are then
-/// `/auth/login`, `/surahs`, etc. — do NOT prefix paths with `/api` again.
+/// По умолчанию `http://localhost:4000/api` — уже с NestJS-префиксом `/api`.
+/// Пути в Dio: `/auth/login`, `/surahs`… — НЕ добавлять `/api` ещё раз.
 class AppConfig {
   AppConfig._();
 

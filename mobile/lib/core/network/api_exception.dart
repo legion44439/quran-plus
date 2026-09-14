@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 
-/// Parses NestJS error bodies (`message` string or array) into a user-facing string.
+/// Разбор тела ошибок NestJS (`message` — строка или массив) в текст для UI.
 String apiErrorMessage(Object error, {String fallback = 'Request failed'}) {
   if (error is DioException) {
     final data = error.response?.data;
@@ -27,6 +27,7 @@ String apiErrorMessage(Object error, {String fallback = 'Request failed'}) {
   return error.toString().isEmpty ? fallback : error.toString();
 }
 
+/// Исключение API с человекочитаемым message и опциональным statusCode.
 class ApiException implements Exception {
   ApiException(this.message, {this.statusCode});
 

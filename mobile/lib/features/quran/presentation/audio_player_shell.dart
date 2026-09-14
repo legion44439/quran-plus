@@ -7,6 +7,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../data/quran_repository.dart';
 
+/// Оболочка плеера: список треков с /audio и управление just_audio.
 class AudioPlayerShell extends ConsumerStatefulWidget {
   const AudioPlayerShell({super.key});
 

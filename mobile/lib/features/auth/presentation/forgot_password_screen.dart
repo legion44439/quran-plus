@@ -6,8 +6,9 @@ import 'package:go_router/go_router.dart';
 import '../../../core/network/api_exception.dart';
 import '../data/auth_repository.dart';
 
-/// Forgot / reset password UI wired to NestJS:
-/// POST /auth/forgot-password {email}, POST /auth/reset-password {token, newPassword}.
+/// Экран «забыл пароль» + сброс по токену.
+/// NestJS: POST /auth/forgot-password {email};
+/// POST /auth/reset-password {token, newPassword}.
 class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});
 
