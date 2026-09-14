@@ -32,7 +32,7 @@ CODE, QP Backend, QP Flutter, QP Admin, QP Infra, QP Материалы, QP Пе
 | Neon: migrate + seed | DONE | migrate+seed DONE, health 200 (QP Советник) |
 | Media presign (`POST /api/media/presign`) | DONE | `021b658` (main/box); env `R2_BUCKET` |
 | `R2_PUBLIC_BASE_URL` / `publicUrl` | DONE | Infra URL + Backend smoke OK (CODE); `https://pub-1174d0af2bc7465bb36bad1557e1b4bf.r2.dev` |
-| Admin AudioForm → presign | В РАБОТЕ | QP Admin вяжет форму аудио к `POST /api/media/presign` (CODE) |
+| Admin AudioForm + ReciterForm → R2 upload | DONE | `6fe0e1c`: presign `folder=audio\|reciters` → `publicUrl` (CODE) |
 | Cloudflare R2 (bindings/auth) | БЛОКЕР | Cloudflare-bindings needsAuth у Sanat |
 | Debug APK (test) | DONE | [releases/tag/debug-apk](https://github.com/legion44439/quran-plus/releases/tag/debug-apk) (`quran-plus-debug.apk`) |
 | arm64 test APK (Honor) | DONE | [releases/tag/apk-arm64-test](https://github.com/legion44439/quran-plus/releases/tag/apk-arm64-test) (`quran-plus-arm64.apk`, ~19–20 MB) |
@@ -42,7 +42,7 @@ CODE, QP Backend, QP Flutter, QP Admin, QP Infra, QP Материалы, QP Пе
 | Критерий: модератор CRUD материалов в web | DONE* | код + admin live (*полный smoke Sanat TBD) |
 | Критерий: супер-админ назначает роли | DONE* | код (*полный smoke Sanat TBD) |
 
-Код продукта HEAD: `021b658` (`main`)
+Код продукта HEAD: `6fe0e1c` (`main`)
 
 ## Фаза 2 / бэклог (после фазы 1)
 Не начата. Сейчас не в работе.
@@ -66,4 +66,4 @@ CODE, QP Backend, QP Flutter, QP Admin, QP Infra, QP Материалы, QP Пе
 ## Примечания
 - Приоритеты меняет только Sanat / QP Советник.
 - Этот файл ведёт QP Контроль.
-- Neon + `R2_PUBLIC_BASE_URL` + media/presign + backend publicUrl smoke — DONE. В работе: Admin AudioForm→presign. Открыто: Cloudflare-bindings auth, API URL с телефона.
+- Neon + media/presign + publicUrl smoke + Admin Audio/Reciter R2 upload (`6fe0e1c`) — DONE. Открыто: Cloudflare-bindings auth, API URL с телефона.
