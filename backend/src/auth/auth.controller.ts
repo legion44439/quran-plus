@@ -8,6 +8,10 @@ import { RefreshDto } from './dto/refresh.dto';
 import { RegisterDto } from './dto/register.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 
+/**
+ * Auth API: вход/регистрация/refresh и сброс пароля.
+ * Все методы @Public — иначе глобальный JwtAuthGuard не даст получить токены.
+ */
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
@@ -44,6 +48,10 @@ export class AuthController {
     return this.auth.logout(dto.refreshToken);
   }
 
+  /**
+   * Запрос сброса: ответ всегда «успех» (не раскрываем наличие email).
+   * В non-prod сервис ещё отдаёт raw resetToken — SMTP в MVP нет.
+   */
   @Public()
   @Post('forgot-password')
   @HttpCode(HttpStatus.OK)
@@ -55,6 +63,7 @@ export class AuthController {
     return this.auth.forgotPassword(dto);
   }
 
+  /** Сброс по токену + revoke всех refresh — старые сессии после смены пароля мертвы. */
   @Public()
   @Post('reset-password')
   @HttpCode(HttpStatus.OK)

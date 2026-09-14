@@ -27,6 +27,10 @@ class SearchQueryDto {
   type?: string;
 }
 
+/**
+ * GET /api/search — агрегированный поиск без auth (гость тоже ищет в приложении).
+ * type сужает группу: surahs | ayahs | translations | reciters.
+ */
 @ApiTags('search')
 @Controller('search')
 export class SearchController {

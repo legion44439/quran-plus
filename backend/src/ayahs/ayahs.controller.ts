@@ -16,6 +16,9 @@ import { AyahsService } from './ayahs.service';
 import { CreateAyahDto } from './dto/create-ayah.dto';
 import { UpdateAyahDto } from './dto/update-ayah.dto';
 
+/**
+ * CRUD айатов: GET публичный; запись — moderator|admin|superadmin.
+ */
 @ApiTags('ayahs')
 @Controller('ayahs')
 export class AyahsController {

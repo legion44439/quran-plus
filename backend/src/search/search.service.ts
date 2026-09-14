@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
+/** ILIKE-поиск по 4 сущностям параллельно; пустой q → пустые массивы (не 400). */
 @Injectable()
 export class SearchService {
   constructor(private prisma: PrismaService) {}

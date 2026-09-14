@@ -16,6 +16,9 @@ import { CreateSurahDto } from './dto/create-surah.dto';
 import { UpdateSurahDto } from './dto/update-surah.dto';
 import { SurahsService } from './surahs.service';
 
+/**
+ * CRUD сур: GET публичный; запись (POST/PATCH/DELETE) — moderator|admin|superadmin.
+ */
 @ApiTags('surahs')
 @Controller('surahs')
 export class SurahsController {

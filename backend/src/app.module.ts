@@ -21,6 +21,10 @@ import { TranslationsModule } from './translations/translations.module';
 import { UsersModule } from './users/users.module';
 import { VideosModule } from './videos/videos.module';
 
+/**
+ * Корневой модуль: JwtAuthGuard + RolesGuard подключены глобально —
+ * защита по умолчанию; публичность только через @Public().
+ */
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),

@@ -69,6 +69,8 @@ Health: `http://localhost:4000/api/health`
 
 Production start (after `npm run build`): `npm run start:prod` → `node dist/src/main` (Nest emits under `dist/src/`).
 
+> **Почему `dist/src/main`:** Nest кладёт `main.js` в `dist/src/`, не в корень `dist/` — иначе `start:prod` получит ENOENT.
+
 ## Example curls
 
 ### Login (seeded superadmin)

@@ -9,6 +9,10 @@ import { Role } from '@prisma/client';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 
+/**
+ * RBAC поверх JWT: при @Roles(...) роль из req.user должна совпасть.
+ * Публичные и «только-auth» маршруты не трогаем — иначе сломаем чтение контента.
+ */
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}

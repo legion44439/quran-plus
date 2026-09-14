@@ -15,6 +15,9 @@ import { CreateReciterDto } from './dto/create-reciter.dto';
 import { UpdateReciterDto } from './dto/update-reciter.dto';
 import { RecitersService } from './reciters.service';
 
+/**
+ * CRUD чтецов: GET публичный; запись — moderator|admin|superadmin.
+ */
 @ApiTags('reciters')
 @Controller('reciters')
 export class RecitersController {

@@ -14,6 +14,10 @@ import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 
+/**
+ * Auth-логика: access JWT (короткий) + opaque refresh (в БД только hash).
+ * Refresh ротируется при каждом /refresh — украденный старый refresh сразу мёртв.
+ */
 @Injectable()
 export class AuthService {
   constructor(
@@ -73,7 +77,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid refresh token');
     }
 
-    // Rotate: revoke old
+    // Ротация: старый refresh отзываем до выдачи новой пары
     await this.prisma.refreshToken.update({
       where: { id: stored.id },
       data: { revokedAt: new Date() },
@@ -97,9 +101,8 @@ export class AuthService {
 
 
   /**
-   * Always returns a generic success message (no email enumeration).
-   * If the user exists, stores a hashed reset token + expiry.
-   * In non-production, also returns/logs the raw token for testing.
+   * Всегда generic success — анти-enumeration по email.
+   * В БД только hash токена + expiry 1ч; raw в ответе/логе — только вне production.
    */
   async forgotPassword(dto: ForgotPasswordDto) {
     const email = dto.email.toLowerCase();
@@ -133,6 +136,10 @@ export class AuthService {
     return generic;
   }
 
+  /**
+   * Одноразовый сброс: чистим reset-поля и revoke всех refresh,
+   * чтобы после смены пароля нельзя было жить со старой сессией.
+   */
   async resetPassword(dto: ResetPasswordDto) {
     const tokenHash = this.hashToken(dto.token);
     const user = await this.prisma.user.findFirst({
@@ -167,6 +174,7 @@ export class AuthService {
     return { success: true, message: 'Password has been reset' };
   }
 
+  /** Access — короткий JWT в заголовке; refresh — opaque, в БД только sha256. */
   private async issueTokens(userId: string, email: string, role: string) {
     const accessToken = await this.jwt.signAsync(
       { sub: userId, email, role },

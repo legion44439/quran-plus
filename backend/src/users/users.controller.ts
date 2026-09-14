@@ -6,6 +6,10 @@ import { Roles } from '../common/decorators/roles.decorator';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { UsersService } from './users.service';
 
+/**
+ * Пользователи: /me для себя; список и смена роли — только superadmin
+ * (иначе admin/moderator могли бы эскалировать права).
+ */
 @ApiTags('users')
 @ApiBearerAuth()
 @Controller('users')
@@ -25,6 +29,7 @@ export class UsersController {
     return this.users.list();
   }
 
+  /** Назначение роли — только superadmin. */
   @Patch(':id/role')
   @Roles(Role.superadmin)
   @ApiOperation({ summary: 'Update user role (superadmin)' })

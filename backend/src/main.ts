@@ -21,6 +21,7 @@ async function bootstrap() {
     }),
   );
 
+  // Глобальный префикс /api — все роуты и Swagger живут под ним (удобно для прокси/клиента).
   app.setGlobalPrefix('api');
 
   const swaggerConfig = new DocumentBuilder()
@@ -37,6 +38,7 @@ async function bootstrap() {
   SwaggerModule.setup('api/docs', app, document);
 
   const config = app.get(ConfigService);
+  // PORT из env (docker/прод), иначе 4000 — мобильный клиент бьёт сюда.
   const port = config.get<number>('PORT') || 4000;
   await app.listen(port);
   console.log(`Quran Plus API listening on http://localhost:${port}`);

@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsString, Matches, MinLength } from 'class-validator';
 
 /**
- * Password rules: same as register — min 8 characters, at least one letter and one number.
+ * Те же правила пароля, что при регистрации — иначе после сброса можно поставить слабый.
  */
 export class ResetPasswordDto {
   @ApiProperty({ description: 'Raw reset token from forgot-password flow' })

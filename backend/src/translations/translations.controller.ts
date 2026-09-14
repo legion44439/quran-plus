@@ -16,6 +16,9 @@ import { CreateTranslationDto } from './dto/create-translation.dto';
 import { UpdateTranslationDto } from './dto/update-translation.dto';
 import { TranslationsService } from './translations.service';
 
+/**
+ * CRUD переводов: GET публичный; запись — moderator|admin|superadmin.
+ */
 @ApiTags('translations')
 @Controller('translations')
 export class TranslationsController {

@@ -10,6 +10,10 @@ export type JwtPayload = {
   role: string;
 };
 
+/**
+ * Валидация access JWT → живой активный User из БД.
+ * Нужно, чтобы деактивированный юзер не проходил по ещё не истёкшему токену.
+ */
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(

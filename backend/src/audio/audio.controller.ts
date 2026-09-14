@@ -16,6 +16,9 @@ import { AudioService } from './audio.service';
 import { CreateAudioDto } from './dto/create-audio.dto';
 import { UpdateAudioDto } from './dto/update-audio.dto';
 
+/**
+ * CRUD аудио-треков: GET публичный; запись — moderator|admin|superadmin.
+ */
 @ApiTags('audio')
 @Controller('audio')
 export class AudioController {

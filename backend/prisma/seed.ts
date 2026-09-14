@@ -3,6 +3,10 @@ import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
+/**
+ * Сид первого superadmin из SUPERADMIN_EMAIL/PASSWORD (или локальные дефолты).
+ * Upsert — повторный seed не ломает стенд и обновляет пароль/роль.
+ */
 async function main() {
   const email = process.env.SUPERADMIN_EMAIL || 'admin@quranplus.local';
   const password = process.env.SUPERADMIN_PASSWORD || 'Admin123!';
