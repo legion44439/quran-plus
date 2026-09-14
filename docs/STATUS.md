@@ -36,9 +36,10 @@ CODE, QP Backend, QP Flutter, QP Admin, QP Infra, QP Материалы, QP Пе
 | Cloudflare R2 (bindings/auth) | БЛОКЕР | Cloudflare-bindings needsAuth у Sanat |
 | Debug APK (test) | DONE | [releases/tag/debug-apk](https://github.com/legion44439/quran-plus/releases/tag/debug-apk) (`quran-plus-debug.apk`) |
 | arm64 test APK (Honor) | DONE | [releases/tag/apk-arm64-test](https://github.com/legion44439/quran-plus/releases/tag/apk-arm64-test) (`quran-plus-arm64.apk`, ~19–20 MB) |
-| Критерий: регистрация/логин на Android | В РАБОТЕ | APK есть; живые данные с телефона — блокер API URL |
-| Критерий: читать/слушать/поиск на устройстве | В РАБОТЕ | UI/темы/навигация ок для смока; данные — блокер API URL |
-| Критерий: профиль на устройстве | В РАБОТЕ | зависит от API URL с телефона |
+| arm64 tunnel APK (Honor, временно) | DONE | тот же release: `quran-plus-arm64-tunnel.apk` (~89 MB debug); API `https://investigate-relevant-right-females.trycloudflare.com/api` (туннель временный, CODE) |
+| Критерий: регистрация/логин на Android | В РАБОТЕ | поставить tunnel APK на Honor и прогнать smoke (туннель временный) |
+| Критерий: читать/слушать/поиск на устройстве | В РАБОТЕ | через tunnel APK; нужен smoke Sanat |
+| Критерий: профиль на устройстве | В РАБОТЕ | через tunnel APK; нужен smoke Sanat |
 | Критерий: модератор CRUD материалов в web | DONE* | код + admin live (*полный smoke Sanat TBD) |
 | Критерий: супер-админ назначает роли | DONE* | код (*полный smoke Sanat TBD) |
 
@@ -56,7 +57,7 @@ CODE, QP Backend, QP Flutter, QP Admin, QP Infra, QP Материалы, QP Пе
 - **OAuth VK + Google** (почта уже DONE в фазе 1)
 
 ## Блокеры
-1. **API URL с телефона** — в APK API = `127.0.0.1:4000` (placeholder), живые данные с Honor не подтягиваются. Нужен реальный API URL + пересборка.
+1. **Стабильный API URL с телефона** — базовый APK всё ещё на `127.0.0.1:4000`. Временно: trycloudflare tunnel + `quran-plus-arm64-tunnel.apk` (туннель падает/меняется — не прод). Нужен постоянный URL + пересборка.
 2. **Cloudflare R2** — connector Cloudflare-bindings ещё **needsAuth** у Sanat (QP Infra / медиа).
 
 ## Вне фазы 1 / отложено
@@ -66,4 +67,4 @@ CODE, QP Backend, QP Flutter, QP Admin, QP Infra, QP Материалы, QP Пе
 ## Примечания
 - Приоритеты меняет только Sanat / QP Советник.
 - Этот файл ведёт QP Контроль.
-- Neon + media/presign + publicUrl smoke + Admin Audio/Reciter R2 upload (`6fe0e1c`) — DONE. Открыто: Cloudflare-bindings auth, API URL с телефона.
+- Neon + media/presign + Admin R2 upload — DONE. Временный tunnel APK для Honor выложен. Открыто: стабильный API URL, Cloudflare-bindings auth, smoke на устройстве.
