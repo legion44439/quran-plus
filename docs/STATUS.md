@@ -23,13 +23,14 @@ CODE, QP Backend, QP Flutter, QP Admin, QP Материалы, QP Перевод
 | Admin `:3000` live | DONE | отчёт CODE |
 | Seed сура 1 | DONE | отчёт CODE / QP Советник |
 | Debug APK (test) | DONE | [releases/tag/debug-apk](https://github.com/legion44439/quran-plus/releases/tag/debug-apk) (`quran-plus-debug.apk`) |
+| arm64 test APK (Honor) | DONE | [releases/tag/apk-arm64-test](https://github.com/legion44439/quran-plus/releases/tag/apk-arm64-test) (`quran-plus-arm64.apk`, ~19–20 MB) |
 | Критерий: регистрация/логин на Android | В РАБОТЕ | APK есть; живые данные с телефона — блокер API URL |
 | Критерий: читать/слушать/поиск на устройстве | В РАБОТЕ | UI/темы/навигация ок для смока; данные — блокер API URL |
 | Критерий: профиль на устройстве | В РАБОТЕ | зависит от API URL с телефона |
 | Критерий: модератор CRUD материалов в web | DONE* | код + admin live (*полный smoke Sanat TBD) |
 | Критерий: супер-админ назначает роли | DONE* | код (*полный smoke Sanat TBD) |
 
-HEAD: `9bb342c` (`main`) · локальный STATUS: `b7404e3`+
+Код продукта HEAD: `9bb342c` · STATUS на main: обновляется отдельно
 
 ## Фаза 2
 Не начата (после закрытия фазы 1).
@@ -42,7 +43,7 @@ HEAD: `9bb342c` (`main`) · локальный STATUS: `b7404e3`+
 - Спонсор
 
 ## Блокеры
-1. **API URL с телефона** — в debug APK API = `127.0.0.1:4000`, живые данные с Honor не подтягиваются. Нужен реальный API URL + пересборка.
+1. **API URL с телефона** — в APK API = `127.0.0.1:4000` (placeholder), живые данные с Honor не подтягиваются. Нужен реальный API URL + пересборка.
 
 ## Отложено
 Идеи на вырост (QP Идеи) — не в приоритете фазы 1.
@@ -50,4 +51,4 @@ HEAD: `9bb342c` (`main`) · локальный STATUS: `b7404e3`+
 ## Примечания
 - Приоритеты меняет только Sanat / QP Советник.
 - Этот файл ведёт QP Контроль.
-- Debug APK: UI / темы / навигация можно смотреть; следующий шаг — API URL + пересборка.
+- APK: UI / темы / навигация можно смотреть; для Honor предпочтителен arm64. Следующий шаг — API URL + пересборка.
