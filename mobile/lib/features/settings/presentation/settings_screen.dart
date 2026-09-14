@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/l10n/app_locales.dart';
 import '../../../core/providers/settings_provider.dart';
 import '../../../core/theme/app_theme.dart';
 
@@ -81,25 +82,30 @@ class SettingsScreen extends ConsumerWidget {
             );
           }),
           const SizedBox(height: 24),
+          // WHY: 7 локалей; два узбекских ряда (Latin / Cyrillic) — не сливать.
           ListTile(
             title: Text('settings_language'.tr()),
-            subtitle: Text(localeCode == 'ru' ? 'Русский' : 'English'),
+            subtitle: Text(
+              AppLocales.nativeName(AppLocales.parse(localeCode)),
+            ),
           ),
-          Padding(
-            padding: const EdgeInsetsDirectional.symmetric(horizontal: 16),
-            child: SegmentedButton<String>(
-              segments: const [
-                ButtonSegment(value: 'ru', label: Text('RU')),
-                ButtonSegment(value: 'en', label: Text('EN')),
+          RadioGroup<String>(
+            groupValue: localeCode,
+            onChanged: (selected) async {
+              if (selected == null) return;
+              await ref.read(localeCodeProvider.notifier).setLocale(selected);
+              if (context.mounted) {
+                await context.setLocale(AppLocales.parse(selected));
+              }
+            },
+            child: Column(
+              children: [
+                for (final locale in AppLocales.supported)
+                  RadioListTile<String>(
+                    title: Text(AppLocales.nativeName(locale)),
+                    value: AppLocales.codeOf(locale),
+                  ),
               ],
-              selected: {localeCode},
-              onSelectionChanged: (s) async {
-                final code = s.first;
-                await ref.read(localeCodeProvider.notifier).setLocale(code);
-                if (context.mounted) {
-                  await context.setLocale(Locale(code));
-                }
-              },
             ),
           ),
           const SizedBox(height: 16),

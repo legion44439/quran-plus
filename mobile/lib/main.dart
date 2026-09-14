@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'core/config/app_config.dart';
+import 'core/l10n/app_locales.dart';
 import 'core/providers/settings_provider.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
@@ -13,6 +14,8 @@ Future<void> main() async {
   await EasyLocalization.ensureInitialized();
 
   final prefs = await SharedPreferences.getInstance();
+  // WHY: startLocale из prefs; uz_Cyrl парсится через AppLocales.parse (script, не country).
+  final startLocale = AppLocales.parse(prefs.getString('locale_code'));
 
   runApp(
     ProviderScope(
@@ -20,10 +23,14 @@ Future<void> main() async {
         sharedPreferencesProvider.overrideWithValue(prefs),
       ],
       child: EasyLocalization(
-        supportedLocales: const [Locale('ru'), Locale('en')],
+        supportedLocales: AppLocales.supported,
         path: 'assets/translations',
-        fallbackLocale: const Locale('ru'),
-        startLocale: Locale(prefs.getString('locale_code') ?? 'ru'),
+        fallbackLocale: AppLocales.fallback,
+        startLocale: startLocale,
+        // WHY: JSON от QP Перевод могут быть неполными — недостающие ключи → ru.
+        useFallbackTranslations: true,
+        // WHY: underscore → uz_Cyrl.json (не дефолтный uz-Cyrl.json).
+        assetLoader: const UnderscoreAssetLoader(),
         child: const QuranPlusApp(),
       ),
     ),
@@ -49,6 +56,7 @@ class QuranPlusApp extends ConsumerWidget {
       routerConfig: router,
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
+      // WHY: locale ar → Flutter RTL автоматически (Directionality); EdgeInsetsDirectional ок.
       locale: context.locale,
     );
   }
