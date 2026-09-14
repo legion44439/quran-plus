@@ -1,0 +1,251 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  user
+  moderator
+  admin
+  superadmin
+}
+
+enum ContentType {
+  surah
+  ayah
+  translation
+  audio
+  video
+  reciter
+  category
+  comment
+  other
+}
+
+model User {
+  id                  String         @id @default(uuid())
+  email               String         @unique
+  passwordHash        String
+  displayName         String?
+  role                Role           @default(user)
+  isActive            Boolean        @default(true)
+  resetTokenHash      String?
+  resetTokenExpiresAt DateTime?
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+  refreshTokens       RefreshToken[]
+  comments            Comment[]
+  favorites           Favorite[]
+  reports             Report[]
+  groupsOwned         Group[]        @relation("GroupOwner")
+  groupMembers        GroupMember[]
+  messages            Message[]
+  auditLogs           AdminAuditLog[]
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  userId    String
+  tokenHash String
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([tokenHash])
+}
+
+model Surah {
+  id            Int      @id // traditionally 1-114; allow any int for flexibility
+  nameArabic    String
+  nameLatin     String
+  nameEnglish   String?
+  revelationType String? // Meccan / Medinan
+  ayahCount     Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  ayahs         Ayah[]
+  audioTracks   AudioTrack[]
+}
+
+model Ayah {
+  id           String        @id @default(uuid())
+  surahId      Int
+  number       Int
+  textArabic   String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  surah        Surah         @relation(fields: [surahId], references: [id], onDelete: Cascade)
+  translations Translation[]
+  audioTracks  AudioTrack[]
+
+  @@unique([surahId, number])
+  @@index([surahId])
+}
+
+model Translation {
+  id          String   @id @default(uuid())
+  ayahId      String
+  language    String
+  text        String
+  translator  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  ayah        Ayah     @relation(fields: [ayahId], references: [id], onDelete: Cascade)
+
+  @@index([ayahId])
+  @@index([language])
+}
+
+model Reciter {
+  id          String       @id @default(uuid())
+  name        String
+  nameArabic  String?
+  bio         String?
+  imageUrl    String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  audioTracks AudioTrack[]
+}
+
+model AudioTrack {
+  id         String   @id @default(uuid())
+  title      String?
+  url        String
+  durationSec Int?
+  reciterId  String
+  surahId    Int?
+  ayahId     String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  reciter    Reciter  @relation(fields: [reciterId], references: [id], onDelete: Cascade)
+  surah      Surah?   @relation(fields: [surahId], references: [id], onDelete: SetNull)
+  ayah       Ayah?    @relation(fields: [ayahId], references: [id], onDelete: SetNull)
+
+  @@index([reciterId])
+  @@index([surahId])
+  @@index([ayahId])
+}
+
+model Category {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  videos      Video[]
+}
+
+model Video {
+  id          String    @id @default(uuid())
+  title       String
+  description String?
+  url         String
+  thumbnailUrl String?
+  durationSec Int?
+  categoryId  String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  category    Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  @@index([categoryId])
+}
+
+model Comment {
+  id          String      @id @default(uuid())
+  userId      String
+  body        String
+  targetType  ContentType
+  targetId    String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([targetType, targetId])
+}
+
+model Favorite {
+  id          String      @id @default(uuid())
+  userId      String
+  targetType  ContentType
+  targetId    String
+  createdAt   DateTime    @default(now())
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, targetType, targetId])
+  @@index([userId])
+}
+
+model Report {
+  id          String      @id @default(uuid())
+  userId      String
+  reason      String
+  details     String?
+  targetType  ContentType
+  targetId    String
+  status      String      @default("open")
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+}
+
+model Group {
+  id          String        @id @default(uuid())
+  name        String
+  description String?
+  ownerId     String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  owner       User          @relation("GroupOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members     GroupMember[]
+  messages    Message[]
+
+  @@index([ownerId])
+}
+
+model GroupMember {
+  id       String   @id @default(uuid())
+  groupId  String
+  userId   String
+  joinedAt DateTime @default(now())
+  group    Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, userId])
+}
+
+model Message {
+  id        String   @id @default(uuid())
+  groupId   String
+  userId    String
+  body      String
+  createdAt DateTime @default(now())
+  group     Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([groupId])
+}
+
+model AdminAuditLog {
+  id        String   @id @default(uuid())
+  actorId   String
+  action    String
+  entity    String
+  entityId  String?
+  meta      Json?
+  createdAt DateTime @default(now())
+  actor     User     @relation(fields: [actorId], references: [id], onDelete: Cascade)
+
+  @@index([actorId])
+  @@index([entity, entityId])
+}

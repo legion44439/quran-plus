@@ -1,0 +1,21 @@
+# deps & builds
+node_modules/
+.next/
+dist/
+build/
+coverage/
+.dart_tool/
+.pub-cache/
+.flutter-plugins-dependencies
+
+# secrets
+.env
+.env.*
+!.env.example
+!.env.local.example
+
+# junk
+.DS_Store
+*.log
+.idea/
+.vscode/
