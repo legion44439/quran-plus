@@ -1,0 +1,53 @@
+# Quran Plus — статус проекта
+
+Обновлено: 2026-09-14  
+Контролёр: QP Контроль  
+Источник фактов: коммиты + отчёты CODE / QP Советник  
+Правило: «сделано» только по факту (SHA / smoke / явное DONE), не по обещаниям.
+
+## Команда
+CODE, QP Backend, QP Flutter, QP Admin, QP Материалы, QP Перевод, QP Идеи, QP Советник, QP Контроль
+
+## Фаза 1 (MVP)
+
+| Пункт | Статус | Факт |
+|-------|--------|------|
+| Репо GitHub private `legion44439/quran-plus` | DONE | remote origin |
+| Backend: auth + роли + CRUD + search | DONE | код в `backend/` |
+| Admin: CRUD + roles | DONE | код в `admin/` |
+| Flutter: auth / ридер / аудио / поиск | DONE | код в `mobile/` |
+| Home шаблон F + 4 темы | DONE | `0232b48` |
+| i18n UI: ar / tg / uz / uz_Cyrl / tr (+ wiring) | DONE | `9bb342c` |
+| Русские комментарии (backend / admin / mobile) | DONE | `218b4f5`, `73736cf`, `136424d` |
+| API `:4000` health | DONE | smoke ok (отчёт CODE) |
+| Admin `:3000` live | DONE | отчёт CODE |
+| Seed сура 1 | DONE | отчёт CODE / QP Советник |
+| Debug APK (test) | DONE | [releases/tag/debug-apk](https://github.com/legion44439/quran-plus/releases/tag/debug-apk) (`quran-plus-debug.apk`) |
+| Критерий: регистрация/логин на Android | В РАБОТЕ | APK есть; живые данные с телефона — блокер API URL |
+| Критерий: читать/слушать/поиск на устройстве | В РАБОТЕ | UI/темы/навигация ок для смока; данные — блокер API URL |
+| Критерий: профиль на устройстве | В РАБОТЕ | зависит от API URL с телефона |
+| Критерий: модератор CRUD материалов в web | DONE* | код + admin live (*полный smoke Sanat TBD) |
+| Критерий: супер-админ назначает роли | DONE* | код (*полный smoke Sanat TBD) |
+
+HEAD: `9bb342c` (`main`) · локальный STATUS: `b7404e3`+
+
+## Фаза 2
+Не начата (после закрытия фазы 1).
+
+- Видео-лекции
+- Статьи
+- Офлайн-загрузка
+- Счётчик просмотров
+- Достижения (простые)
+- Спонсор
+
+## Блокеры
+1. **API URL с телефона** — в debug APK API = `127.0.0.1:4000`, живые данные с Honor не подтягиваются. Нужен реальный API URL + пересборка.
+
+## Отложено
+Идеи на вырост (QP Идеи) — не в приоритете фазы 1.
+
+## Примечания
+- Приоритеты меняет только Sanat / QP Советник.
+- Этот файл ведёт QP Контроль.
+- Debug APK: UI / темы / навигация можно смотреть; следующий шаг — API URL + пересборка.
