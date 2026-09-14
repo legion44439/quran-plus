@@ -2,7 +2,7 @@
 
 /**
  * Форма аудио → NestJS /audio.
- * Обязательны URL и чтец; сура/аят опциональны для привязки трека.
+ * URL можно вставить вручную или загрузить файл в R2 через /media/presign.
  */
 
 import { useEffect, useState } from "react";
@@ -17,6 +17,7 @@ import {
   listSurahs,
   updateAudio,
 } from "@/lib/content-api";
+import { uploadFileToR2 } from "@/lib/media-api";
 import type { AudioTrack, Reciter, Surah } from "@/lib/types";
 
 type Props = {
@@ -24,6 +25,12 @@ type Props = {
   id?: string;
   initial?: Partial<AudioTrack>;
 };
+
+type UploadStatus =
+  | { kind: "idle" }
+  | { kind: "uploading"; name: string }
+  | { kind: "ok"; name: string }
+  | { kind: "error"; message: string };
 
 export function AudioForm({ mode, id, initial }: Props) {
   const router = useRouter();
@@ -40,6 +47,9 @@ export function AudioForm({ mode, id, initial }: Props) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [uploadStatus, setUploadStatus] = useState<UploadStatus>({
+    kind: "idle",
+  });
 
   useEffect(() => {
     let cancelled = false;
@@ -79,6 +89,25 @@ export function AudioForm({ mode, id, initial }: Props) {
       cancelled = true;
     };
   }, [mode, id, initial]);
+
+  async function onFileSelected(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+
+    setUploadStatus({ kind: "uploading", name: file.name });
+    setError(null);
+    try {
+      const result = await uploadFileToR2(file, "audio");
+      setForm((f) => ({ ...f, url: result.publicUrl }));
+      setUploadStatus({ kind: "ok", name: file.name });
+    } catch (err) {
+      setUploadStatus({
+        kind: "error",
+        message: apiErrorMessage(err, "Ошибка загрузки файла"),
+      });
+    }
+  }
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -128,6 +157,8 @@ export function AudioForm({ mode, id, initial }: Props) {
     })),
   ];
 
+  const uploading = uploadStatus.kind === "uploading";
+
   return (
     <form
       onSubmit={onSubmit}
@@ -142,9 +173,42 @@ export function AudioForm({ mode, id, initial }: Props) {
         label="URL аудио"
         type="url"
         value={form.url}
-        onChange={(e) => setForm((f) => ({ ...f, url: e.target.value }))}
+        onChange={(e) => {
+          setForm((f) => ({ ...f, url: e.target.value }));
+          if (uploadStatus.kind === "ok" || uploadStatus.kind === "error") {
+            setUploadStatus({ kind: "idle" });
+          }
+        }}
         required
+        hint="Вставьте ссылку или загрузите файл ниже"
       />
+
+      <label className="flex flex-col gap-1.5 text-sm">
+        <span className="font-medium text-[var(--color-foreground)]">
+          Загрузить файл
+        </span>
+        <input
+          type="file"
+          accept="audio/*"
+          disabled={uploading || saving}
+          onChange={onFileSelected}
+          className="rounded-lg border border-[var(--color-border)] bg-white px-3 py-2 text-sm file:mr-3 file:rounded-md file:border-0 file:bg-[var(--color-primary)]/10 file:px-3 file:py-1 file:text-sm file:font-medium"
+        />
+        {uploadStatus.kind === "uploading" ? (
+          <span className="text-xs text-[var(--color-muted-fg)]">
+            Загрузка «{uploadStatus.name}» в R2…
+          </span>
+        ) : null}
+        {uploadStatus.kind === "ok" ? (
+          <span className="text-xs text-emerald-700">
+            Файл «{uploadStatus.name}» загружен — URL подставлен
+          </span>
+        ) : null}
+        {uploadStatus.kind === "error" ? (
+          <span className="text-xs text-red-600">{uploadStatus.message}</span>
+        ) : null}
+      </label>
+
       <Input
         label="Длительность (сек)"
         type="number"
@@ -182,7 +246,7 @@ export function AudioForm({ mode, id, initial }: Props) {
       <div className="flex gap-2 pt-2">
         <Button
           type="submit"
-          disabled={saving || !form.reciterId || !form.url}
+          disabled={saving || uploading || !form.reciterId || !form.url}
         >
           {saving ? "Сохранение…" : mode === "create" ? "Создать" : "Сохранить"}
         </Button>
