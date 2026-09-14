@@ -14,6 +14,7 @@ CODE, QP Backend, QP Flutter, QP Admin, QP Материалы, QP Перевод
 |-------|--------|------|
 | Репо GitHub private `legion44439/quran-plus` | DONE | remote origin |
 | Backend: auth + роли + CRUD + search | DONE | код в `backend/` |
+| Auth по почте (регистрация / вход / restore) | DONE | в составе backend/Flutter auth |
 | Admin: CRUD + roles | DONE | код в `admin/` |
 | Flutter: auth / ридер / аудио / поиск | DONE | код в `mobile/` |
 | Home шаблон F + 4 темы | DONE | `0232b48` |
@@ -32,8 +33,8 @@ CODE, QP Backend, QP Flutter, QP Admin, QP Материалы, QP Перевод
 
 Код продукта HEAD: `9bb342c` · STATUS на main: обновляется отдельно
 
-## Фаза 2
-Не начата (после закрытия фазы 1).
+## Фаза 2 / бэклог (после фазы 1)
+Не начата. Сейчас не в работе.
 
 - Видео-лекции
 - Статьи
@@ -41,6 +42,7 @@ CODE, QP Backend, QP Flutter, QP Admin, QP Материалы, QP Перевод
 - Счётчик просмотров
 - Достижения (простые)
 - Спонсор
+- **OAuth VK + Google** (почта уже DONE в фазе 1)
 
 ## Блокеры
 1. **API URL с телефона** — в APK API = `127.0.0.1:4000` (placeholder), живые данные с Honor не подтягиваются. Нужен реальный API URL + пересборка.
