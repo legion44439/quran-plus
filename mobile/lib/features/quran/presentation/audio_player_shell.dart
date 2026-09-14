@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 
-import '../../../core/theme/app_theme.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../data/quran_repository.dart';
 
@@ -76,7 +75,7 @@ class _AudioPlayerShellState extends ConsumerState<AudioPlayerShell> {
                       selected: selected,
                       leading: Icon(
                         selected ? Icons.equalizer : Icons.audiotrack,
-                        color: AppColors.green,
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                       title: Text(
                         t.title?.isNotEmpty == true
@@ -140,7 +139,7 @@ class _AudioPlayerShellState extends ConsumerState<AudioPlayerShell> {
                                 ),
                               );
                             },
-                      activeColor: AppColors.green,
+                      activeColor: Theme.of(context).colorScheme.primary,
                     );
                   },
                 );
@@ -173,7 +172,7 @@ class _AudioPlayerShellState extends ConsumerState<AudioPlayerShell> {
                           playing
                               ? Icons.pause_circle_filled
                               : Icons.play_circle_filled,
-                          color: AppColors.green,
+                          color: Theme.of(context).colorScheme.primary,
                         ),
                       ),
                     IconButton(

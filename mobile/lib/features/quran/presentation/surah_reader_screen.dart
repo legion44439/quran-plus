@@ -4,18 +4,37 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/providers/settings_provider.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../data/quran_repository.dart';
 
 /// Чтение суры: арабский текст + перевод (репозиторий тянет /ayahs).
-class SurahReaderScreen extends ConsumerWidget {
+/// WHY: при открытии сохраняем last_surah_id для Home «Continue reading».
+class SurahReaderScreen extends ConsumerStatefulWidget {
   const SurahReaderScreen({super.key, required this.surahId});
 
   final String surahId;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final id = int.tryParse(surahId) ?? 0;
+  ConsumerState<SurahReaderScreen> createState() => _SurahReaderScreenState();
+}
+
+class _SurahReaderScreenState extends ConsumerState<SurahReaderScreen> {
+  @override
+  void initState() {
+    super.initState();
+    final id = int.tryParse(widget.surahId);
+    if (id != null && id > 0) {
+      // После первого кадра — prefs async, не блокируем build.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.read(lastReadingProvider.notifier).save(surahId: id);
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final id = int.tryParse(widget.surahId) ?? 0;
     final detail = ref.watch(surahDetailProvider(id));
 
     return Scaffold(
@@ -24,8 +43,9 @@ class SurahReaderScreen extends ConsumerWidget {
           detail.maybeWhen(
             data: (d) => d?.surah.nameLatin.isNotEmpty == true
                 ? d!.surah.nameLatin
-                : '${'surah_reader_title'.tr()} · $surahId',
-            orElse: () => '${'surah_reader_title'.tr()} · $surahId',
+                : '${'surah_reader_title'.tr()} · ${widget.surahId}',
+            orElse: () =>
+                '${'surah_reader_title'.tr()} · ${widget.surahId}',
           ),
         ),
         actions: [

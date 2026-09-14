@@ -37,12 +37,14 @@ class QuranPlusApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(appRouterProvider);
     final themeMode = ref.watch(themeModeProvider);
+    // WHY: палитра и themeMode независимы — смена цвета без смены light/dark.
+    final palette = ref.watch(appPaletteProvider);
 
     return MaterialApp.router(
       title: AppConfig.appName,
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.light(),
-      darkTheme: AppTheme.dark(),
+      theme: AppTheme.light(palette),
+      darkTheme: AppTheme.dark(palette),
       themeMode: themeMode,
       routerConfig: router,
       localizationsDelegates: context.localizationDelegates,
