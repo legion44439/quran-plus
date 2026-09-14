@@ -2,7 +2,7 @@
 
 Обновлено: 2026-09-14  
 Контролёр: QP Контроль  
-Источник фактов: коммиты + отчёты CODE / QP Советник  
+Источник фактов: коммиты + отчёты CODE / QP Советник / QP Infra  
 Правило: «сделано» только по факту (SHA / smoke / явное DONE), не по обещаниям.
 
 ## Команда
@@ -31,7 +31,7 @@ CODE, QP Backend, QP Flutter, QP Admin, QP Infra, QP Материалы, QP Пе
 | Seed сура 1 | DONE | отчёт CODE / QP Советник |
 | Neon: migrate + seed | DONE | migrate+seed DONE, health 200 (QP Советник) |
 | Media presign (`POST /api/media/presign`) | DONE | `021b658` (main/box); env `R2_BUCKET` |
-| `publicUrl` для медиа | В РАБОТЕ | ждёт `R2_PUBLIC_BASE_URL` от QP Infra |
+| `R2_PUBLIC_BASE_URL` / `publicUrl` | DONE | в `backend/.env`: `https://pub-1174d0af2bc7465bb36bad1557e1b4bf.r2.dev` (r2.dev для `quran-plus-media`, QP Infra) |
 | Cloudflare R2 (bindings/auth) | БЛОКЕР | Cloudflare-bindings needsAuth у Sanat |
 | Debug APK (test) | DONE | [releases/tag/debug-apk](https://github.com/legion44439/quran-plus/releases/tag/debug-apk) (`quran-plus-debug.apk`) |
 | arm64 test APK (Honor) | DONE | [releases/tag/apk-arm64-test](https://github.com/legion44439/quran-plus/releases/tag/apk-arm64-test) (`quran-plus-arm64.apk`, ~19–20 MB) |
@@ -57,7 +57,6 @@ CODE, QP Backend, QP Flutter, QP Admin, QP Infra, QP Материалы, QP Пе
 ## Блокеры
 1. **API URL с телефона** — в APK API = `127.0.0.1:4000` (placeholder), живые данные с Honor не подтягиваются. Нужен реальный API URL + пересборка.
 2. **Cloudflare R2** — connector Cloudflare-bindings ещё **needsAuth** у Sanat (QP Infra / медиа).
-3. **`R2_PUBLIC_BASE_URL`** — нужен от QP Infra, иначе `publicUrl` после presign неполный.
 
 ## Вне фазы 1 / отложено
 - Чаты / соц. лента — не фаза 1 (msg → Postgres, attachments → R2)
@@ -66,4 +65,4 @@ CODE, QP Backend, QP Flutter, QP Admin, QP Infra, QP Материалы, QP Пе
 ## Примечания
 - Приоритеты меняет только Sanat / QP Советник.
 - Этот файл ведёт QP Контроль.
-- Neon Postgres: migrate+seed DONE. Media presign в коде (`021b658`). R2 auth + `R2_PUBLIC_BASE_URL` + API URL — открытые хвосты.
+- Neon + `R2_PUBLIC_BASE_URL` + media/presign — DONE. Открыто: Cloudflare-bindings auth, API URL с телефона.
