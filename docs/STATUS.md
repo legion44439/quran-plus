@@ -6,7 +6,7 @@
 Правило: «сделано» только по факту (SHA / smoke / явное DONE), не по обещаниям.
 
 ## Команда
-CODE, QP Backend, QP Flutter, QP Admin, QP Infra, QP Материалы, QP Перевод, QP Идеи, QP Советник, QP Контроль
+CODE, QP Backend, QP Flutter, QP Admin, QP Infra, QP Материалы, QP Перевод, QP Идеи, QP Советник, QP Контроль, QP Справочник
 
 ## Решения (зафиксировано)
 - Архитектура **A**: см. [ARCHITECTURE.md](./ARCHITECTURE.md)
@@ -30,7 +30,9 @@ CODE, QP Backend, QP Flutter, QP Admin, QP Infra, QP Материалы, QP Пе
 | Admin `:3000` live | DONE | отчёт CODE |
 | Seed сура 1 | DONE | отчёт CODE / QP Советник |
 | Neon: migrate + seed | DONE | migrate+seed DONE, health 200 (QP Советник) |
-| Cloudflare R2 | БЛОКЕР | Cloudflare-bindings needsAuth у Sanat |
+| Media presign (`POST /api/media/presign`) | DONE | `021b658` (main/box); env `R2_BUCKET` |
+| `publicUrl` для медиа | В РАБОТЕ | ждёт `R2_PUBLIC_BASE_URL` от QP Infra |
+| Cloudflare R2 (bindings/auth) | БЛОКЕР | Cloudflare-bindings needsAuth у Sanat |
 | Debug APK (test) | DONE | [releases/tag/debug-apk](https://github.com/legion44439/quran-plus/releases/tag/debug-apk) (`quran-plus-debug.apk`) |
 | arm64 test APK (Honor) | DONE | [releases/tag/apk-arm64-test](https://github.com/legion44439/quran-plus/releases/tag/apk-arm64-test) (`quran-plus-arm64.apk`, ~19–20 MB) |
 | Критерий: регистрация/логин на Android | В РАБОТЕ | APK есть; живые данные с телефона — блокер API URL |
@@ -39,7 +41,7 @@ CODE, QP Backend, QP Flutter, QP Admin, QP Infra, QP Материалы, QP Пе
 | Критерий: модератор CRUD материалов в web | DONE* | код + admin live (*полный smoke Sanat TBD) |
 | Критерий: супер-админ назначает роли | DONE* | код (*полный smoke Sanat TBD) |
 
-Код продукта HEAD: `9bb342c` · STATUS на main: обновляется отдельно
+Код продукта HEAD: `021b658` (`main`)
 
 ## Фаза 2 / бэклог (после фазы 1)
 Не начата. Сейчас не в работе.
@@ -55,6 +57,7 @@ CODE, QP Backend, QP Flutter, QP Admin, QP Infra, QP Материалы, QP Пе
 ## Блокеры
 1. **API URL с телефона** — в APK API = `127.0.0.1:4000` (placeholder), живые данные с Honor не подтягиваются. Нужен реальный API URL + пересборка.
 2. **Cloudflare R2** — connector Cloudflare-bindings ещё **needsAuth** у Sanat (QP Infra / медиа).
+3. **`R2_PUBLIC_BASE_URL`** — нужен от QP Infra, иначе `publicUrl` после presign неполный.
 
 ## Вне фазы 1 / отложено
 - Чаты / соц. лента — не фаза 1 (msg → Postgres, attachments → R2)
@@ -63,4 +66,4 @@ CODE, QP Backend, QP Flutter, QP Admin, QP Infra, QP Материалы, QP Пе
 ## Примечания
 - Приоритеты меняет только Sanat / QP Советник.
 - Этот файл ведёт QP Контроль.
-- Neon Postgres: migrate+seed DONE. R2 ждёт auth Sanat. Фокус устройства: API URL + APK.
+- Neon Postgres: migrate+seed DONE. Media presign в коде (`021b658`). R2 auth + `R2_PUBLIC_BASE_URL` + API URL — открытые хвосты.
