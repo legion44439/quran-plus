@@ -19,19 +19,57 @@ class _AudioPlayerShellState extends ConsumerState<AudioPlayerShell> {
   AudioTrack? _current;
   bool _loadingTrack = false;
 
+  /// Локальный scrub: пока палец на ползунке — не конфликтуем с positionStream.
+  bool _dragging = false;
+  double _dragValue = 0;
+
   @override
   void dispose() {
     _player.dispose();
     super.dispose();
   }
 
+  /// mm:ss для подписей под ползунком (даже если duration ещё неизвестна).
+  String _fmt(Duration d) {
+    final totalSec = d.inSeconds.clamp(0, 24 * 3600);
+    final m = totalSec ~/ 60;
+    final s = (totalSec % 60).toString().padLeft(2, '0');
+    return '$m:$s';
+  }
+
+  /// Итоговая длительность: сначала из плеера, иначе из API durationSec.
+  /// Иначе remote mp3 часто даёт duration=null и Slider становится disabled.
+  Duration _effectiveTotal(Duration? playerDuration) {
+    if (playerDuration != null && playerDuration > Duration.zero) {
+      return playerDuration;
+    }
+    final sec = _current?.durationSec;
+    if (sec != null && sec > 0) {
+      return Duration(seconds: sec);
+    }
+    return Duration.zero;
+  }
+
   Future<void> _play(AudioTrack track) async {
     setState(() {
       _current = track;
       _loadingTrack = true;
+      _dragging = false;
     });
     try {
       await _player.setUrl(track.url);
+      // Ждём ready/buffering: иначе duration ещё null и seek «мёртвый».
+      await _player.processingStateStream
+          .firstWhere(
+            (s) =>
+                s == ProcessingState.ready ||
+                s == ProcessingState.buffering ||
+                s == ProcessingState.completed,
+          )
+          .timeout(
+            const Duration(seconds: 15),
+            onTimeout: () => ProcessingState.ready,
+          );
       await _player.play();
     } catch (_) {
       if (mounted) {
@@ -115,31 +153,79 @@ class _AudioPlayerShellState extends ConsumerState<AudioPlayerShell> {
               style: Theme.of(context).textTheme.titleMedium,
               textAlign: TextAlign.center,
             ),
+            // Ползунок всегда рисуем: fallback на durationSec, чтобы seek не пропадал.
             StreamBuilder<Duration?>(
               stream: _player.durationStream,
               builder: (context, snap) {
-                final total = snap.data ?? Duration.zero;
+                final total = _effectiveTotal(snap.data ?? _player.duration);
                 return StreamBuilder<Duration>(
                   stream: _player.positionStream,
                   builder: (context, posSnap) {
                     final pos = posSnap.data ?? Duration.zero;
                     final maxMs = total.inMilliseconds.toDouble();
-                    final value = maxMs <= 0
+                    final canSeek = maxMs > 0;
+                    // Абсолютные мс: проще, чем 0..1, и совпадает с Duration.
+                    final displayMs = !canSeek
                         ? 0.0
-                        : pos.inMilliseconds.clamp(0, total.inMilliseconds) /
-                            maxMs;
-                    return Slider(
-                      value: value,
-                      onChanged: maxMs <= 0
-                          ? null
-                          : (v) {
-                              _player.seek(
-                                Duration(
-                                  milliseconds: (v * maxMs).round(),
-                                ),
-                              );
-                            },
-                      activeColor: Theme.of(context).colorScheme.primary,
+                        : (_dragging
+                            ? _dragValue
+                            : pos.inMilliseconds
+                                .clamp(0, total.inMilliseconds)
+                                .toDouble());
+                    final labelPos = Duration(
+                      milliseconds: displayMs.round(),
+                    );
+
+                    return Column(
+                      children: [
+                        Slider(
+                          min: 0,
+                          max: canSeek ? maxMs : 1.0,
+                          value: canSeek
+                              ? displayMs.clamp(0.0, maxMs)
+                              : 0.0,
+                          onChanged: !canSeek
+                              ? null
+                              : (v) {
+                                  // Только UI-scrub; seek — в onChangeEnd.
+                                  setState(() {
+                                    _dragging = true;
+                                    _dragValue = v;
+                                  });
+                                },
+                          onChangeEnd: !canSeek
+                              ? null
+                              : (v) async {
+                                  await _player.seek(
+                                    Duration(milliseconds: v.round()),
+                                  );
+                                  if (mounted) {
+                                    setState(() => _dragging = false);
+                                  }
+                                },
+                          activeColor:
+                              Theme.of(context).colorScheme.primary,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          child: Row(
+                            mainAxisAlignment:
+                                MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                _fmt(labelPos),
+                                style:
+                                    Theme.of(context).textTheme.bodySmall,
+                              ),
+                              Text(
+                                canSeek ? _fmt(total) : '--:--',
+                                style:
+                                    Theme.of(context).textTheme.bodySmall,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     );
                   },
                 );
