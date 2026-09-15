@@ -1,6 +1,6 @@
 # Quran Plus — статус проекта
 
-Обновлено: 2026-09-14  
+Обновлено: 2026-09-15  
 Контролёр: QP Контроль  
 Источник фактов: коммиты + отчёты CODE / QP Советник / QP Infra  
 Правило: «сделано» только по факту (SHA / smoke / явное DONE), не по обещаниям.
@@ -30,6 +30,7 @@ CODE, QP Backend, QP Flutter, QP Admin, QP Infra, QP Материалы, QP Пе
 | Admin `:3000` live | DONE | отчёт CODE |
 | Seed сура 1 | DONE | отчёт CODE / QP Советник |
 | Neon: migrate + seed | DONE | migrate+seed DONE, health 200 (QP Советник) |
+| Neon content seed | DONE | surahs 114, ayahs 7 (Fatiha), translations 7 ru, reciters 1, audio 1, videos 1 (CODE) |
 | Media presign (`POST /api/media/presign`) | DONE | `021b658` (main/box); env `R2_BUCKET` |
 | `R2_PUBLIC_BASE_URL` / `publicUrl` | DONE | Infra URL + Backend smoke OK (CODE); `https://pub-1174d0af2bc7465bb36bad1557e1b4bf.r2.dev` |
 | Admin AudioForm + ReciterForm → R2 upload | DONE | `6fe0e1c`: presign `folder=audio\|reciters` → `publicUrl` (CODE) |
@@ -67,4 +68,4 @@ CODE, QP Backend, QP Flutter, QP Admin, QP Infra, QP Материалы, QP Пе
 ## Примечания
 - Приоритеты меняет только Sanat / QP Советник.
 - Этот файл ведёт QP Контроль.
-- Neon + media/presign + Admin R2 upload — DONE. Временный tunnel APK для Honor выложен. Открыто: стабильный API URL, Cloudflare-bindings auth, smoke на устройстве.
+- Neon (migrate + content seed: 114 сур / Fatiha / ru) + media/presign + Admin R2 upload — DONE. Временный tunnel APK для Honor выложен. Открыто: стабильный API URL, Cloudflare-bindings auth, smoke на устройстве.
