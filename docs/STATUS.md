@@ -23,6 +23,7 @@ CODE, QP Backend, QP Flutter, QP Admin, QP Infra, QP Материалы, QP Пе
 | Auth по почте (регистрация / вход / restore) | DONE | в составе backend/Flutter auth |
 | Admin: CRUD + roles | DONE | код в `admin/` |
 | Flutter: auth / ридер / аудио / поиск | DONE | код в `mobile/` |
+| Audio seek bar (Flutter) | DONE | `6961a6c` (CODE); APK не пересобирали по решению Sanat |
 | Home шаблон F + 4 темы | DONE | `0232b48` |
 | i18n UI: ar / tg / uz / uz_Cyrl / tr (+ wiring) | DONE | `9bb342c` |
 | Русские комментарии (backend / admin / mobile) | DONE | `218b4f5`, `73736cf`, `136424d` |
@@ -44,7 +45,7 @@ CODE, QP Backend, QP Flutter, QP Admin, QP Infra, QP Материалы, QP Пе
 | Критерий: модератор CRUD материалов в web | DONE* | код + admin live (*полный smoke Sanat TBD) |
 | Критерий: супер-админ назначает роли | DONE* | код (*полный smoke Sanat TBD) |
 
-Код продукта HEAD: `6fe0e1c` (`main`)
+Код продукта HEAD: `6961a6c` (`main`)
 
 ## Фаза 2 / бэклог (после фазы 1)
 Не начата. Сейчас не в работе.
